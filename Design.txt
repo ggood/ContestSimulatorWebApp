@@ -1,0 +1,108 @@
+
+
+Model
+=====
+
+Station:
+  callSign (storage)
+  QSK (storage)
+  CW Speed (storage)
+  CW Pitch (storage)
+  RX Bandwidth (storage)
+  Monitor Level (storage)
+  RIT
+  Band Conditions
+    QRN (storage)
+    Flutter (storage)
+    QRM (storage)
+    Lids (storage)
+    QSB (storage)
+    Activity Level (storage)
+  Log
+
+  Views
+  =====
+
+  Station:
+    callSign (text)
+    QSK (checkbox)
+    CW Speed (spinner)
+    CW Pitch (popup menu)
+    RX Bandwidth (popup menu)
+    Monitor Level (slider)
+  Band Conditions:
+    QRN (checkbox)
+    Flutter (checkbox)
+    QRM (checkbox)
+    Lids (checkbox)
+    QSB (checkbox)
+    Activity Level (spinner)
+  Run Button (button)
+  Contest Duration (spinner)
+  Current Time (text)
+  Summary (text)
+  Pile-up depth (text)
+  Rate (text)
+  Rate Graph (bar graph)
+  Input Area:
+    Call (text)
+    Exchange RST (text)
+    Number (text)
+  Send buttons
+    F1
+    F2
+    F3
+    F4
+    F5
+    F6
+    F7
+    F8
+  Log (text block)
+
+  Menus
+  =====
+
+    file
+      View Score Table
+      View Hi-Score Web Page
+      Audio Recording Enabled
+      Play Recorded audio
+      Exit
+    Run
+      Pile-Up
+      Single Calls
+      WPX Competition
+      HST Competition
+      Stop
+    Send
+      (one for each F-key)
+    Settings
+      (one for each preference)
+      HST Operator's Name
+    Help
+      Web Page...
+      Readme...
+      About...
+
+  Signal Chain (SO1R)
+  ===================
+
+  DX Stations[]  ---\
+                    |
+  QRM Stations[] ---|
+                    \
+  QRN Bursts --------- Filter Bank --- QSK (Gain) ----\
+                     /                                 \
+  Noise Source ------                                   output
+                                                       /
+  My Station --------- Monitor Gain ------------------/
+
+
+  DX, QRM, and My Station:
+
+  Tone Generator --- Keying Envelope and Gain (Gain)
+
+  Noise source generates random waveform for playback
+
+  QRN bursts are a louder noise waveform with a gain
+  control that is enabled or disabled by the main code.

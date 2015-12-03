@@ -1,0 +1,45 @@
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <script src="http://anthonyterrien.com/js/jquery.knob.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
+
+  <script src="station_list.js"></script>
+  <script src="station.js"></script>
+  <script src="contest.js"></script>
+  <script src="app.js"></script>
+
+</head>
+
+<body>
+  <div id="log">
+    <p id="log-header">Time Callsign RST NR
+      <p id="log-text">0233 KT8K 599 022
+      </p>
+  </div>
+  <label for="callsign">Call</label>
+  <input type="text" id="callsign" class="qso-input">
+  <label for="rst">RST</label>
+  <input type="text" id="rst" class="qso-input">
+   <label for="number">NR</label>
+  <input type="text" id="number" class="qso-input">
+  <br>
+  <button type="button" id="f1" class="fkey-button">F1</button>
+  <button type="button" id="f2" class="fkey-button">F2</button>
+  <button type="button" id="f3" class="fkey-button">F3</button>
+  <button type="button" id="f4" class="fkey-button">F4</button>
+  <p>
+    <div id="knobs">
+      <input id="af-gain" class="knob" data-width="80" data-cursor=false data-fgColor="#883300" data-thickness=.4 value="100">
+      <input id="mon-gain" class="knob" data-width="80" data-cursor=false data-fgColor="#4444ff" data-thickness=.4 value="50">
+    </div>
+  <div id="bottom">
+    <button type="button" id="run-button">Run</button>
+  </div>
+  <br>
+</body>
+
+</html>

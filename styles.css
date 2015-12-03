@@ -1,0 +1,45 @@
+#log {
+  height: 100px;
+  overflow: scroll;
+  font-family: Courier;
+}
+#log-header {
+  font-weight: bold;
+  white-space: pre;
+}
+#log-text {
+  white-space: pre;
+}
+#callsign {
+  width: 12ch;
+}
+#rst {
+  width: 3ch;
+}
+#number {
+  width: 5ch;
+}
+#knobs {
+  width: 100%
+}
+#run-button {
+  font-size: large;
+  background-color: #4df;
+  width: 80px;
+  height: 30px;
+}
+body {
+  font-size: large;
+}
+
+.fkey-button {
+  font-size: large;
+  background-color: #999;
+  width: 80px;
+  height: 30px;
+}
+.qso-input {
+  height: 30px;
+  font-size: large;
+  text-transform: uppercase;
+}
