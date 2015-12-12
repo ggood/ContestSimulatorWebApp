@@ -28,20 +28,68 @@ $(function() {
 
   $("#run-button").click(function() {
     if (contest.isRunning) {
-      console.log("WAS RUNNING");
       contest.stop();
       $("#run-button").html("Run");
     } else {
-      console.log("WAS NOT RUNNING");
       contest.start();
       contest.finishCq();
       $("#run-button").html("Stop");
     }
   });
 
+  $("#f1").click(function() {
+    contest.myStation.callCq();
+  });
+
+  $("#f2").click(function() {
+    contest.myStation.sendExchange();
+  });
+
+  $("#f3").click(function() {
+    contest.myStation.sendTU();
+  });
+
+  $("#f4").click(function() {
+    contest.myStation.sendCallSign();
+  });
+
+  $("#af-gain").knob({
+    change : function (value) {
+        console.log("AF GAIN change : " + value);
+        contest.setVolume(value);
+    }
+  });
+
+  $("#mon-gain").knob({
+    change : function (value) {
+        console.log("MON GAIN change : " + value);
+    }
+  });
+
+  $("#cw-pitch").knob({
+    change : function (value) {
+        console.log("PITCH change : " + value);
+        contest.myStation.setPitch(value);
+    }
+  });
+
+  $("#filter-frequency").knob({
+    change : function (value) {
+        console.log("FILTER FREQUENCY change : " + value);
+        contest.setFilterFrequency(value);
+    }
+  });
+
+  $("#filter-q").knob({
+    change : function (value) {
+        console.log("FILTER Q change : " + value / 100);
+        contest.setFilterQ(value / 100);
+    }
+  });
+
   $(".knob").knob({
     /*change : function (value) {
-        //console.log("change : " + value);
+        console.log("change : " + value);
     },
     release : function (value) {
         console.log("release : " + value);

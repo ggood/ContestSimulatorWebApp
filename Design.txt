@@ -1,4 +1,13 @@
 
+Open Issues:
+
+- A station should just send output to a provided destination. That way,
+I can run all the DX stations output into a mixer, and then the output
+of that mixer goes into a separate two-channel mixer with inputs (1) all
+stations and (2) my station. That way it's easier to mute the other stations.
+
+It may be getting to the point where I understand enough about this to
+delete all the code and start over.
 
 Model
 =====

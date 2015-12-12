@@ -1,3 +1,7 @@
+/*
+Audio node that generates no1se.
+*/
+
 function NoiseSource() {
   this.node = context.createScriptProcessor(1024, 1, 2);
   this.node.onaudioprocess = this.process;
