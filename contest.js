@@ -23,7 +23,7 @@ var Contest = function() {
 
   // Master gain
   this.masterGain = context.createGain();
-  this.masterGain.gain.value = 1;
+  this.masterGain.gain.value = 1.0;
 
   console.log("Contest instance created");
 };
@@ -53,7 +53,7 @@ Contest.prototype.setFilterQ = function(value) {
 };
 
 Contest.prototype.setVolume = function(value) {
-  this.masterGain.value = value / 100;
+  this.masterGain.gain.value = value;
 };
 
 Contest.prototype.finishCq = function() {

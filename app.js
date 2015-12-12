@@ -55,8 +55,8 @@ $(function() {
 
   $("#af-gain").knob({
     change : function (value) {
-        console.log("AF GAIN change : " + value);
-        contest.setVolume(value);
+        console.log("AF GAIN change : " + value / 100);
+        contest.setVolume(value / 100);
     }
   });
 
