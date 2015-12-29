@@ -5,9 +5,12 @@ Open Issues:
 I can run all the DX stations output into a mixer, and then the output
 of that mixer goes into a separate two-channel mixer with inputs (1) all
 stations and (2) my station. That way it's easier to mute the other stations.
+(Done, I think)
 
-It may be getting to the point where I understand enough about this to
-delete all the code and start over.
+- Since I queue up all the dots and dashes for the entire message coming
+from a station, I need a way to abort all the scheduled output, to
+simulate a station hearing a call and stopping.
+
 
 Model
 =====
