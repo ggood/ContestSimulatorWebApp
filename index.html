@@ -1,0 +1,65 @@
+<html>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <script src="http://anthonyterrien.com/js/jquery.knob.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
+
+  <script src="station_list.js"></script>
+  <script src="station.js"></script>
+  <script src="noise.js"></script>
+  <script src="contest.js"></script>
+  <script src="app.js"></script>
+
+</head>
+
+<body>
+  <div id="log">
+    <p id="log-header">Time Callsign RST NR
+      <p id="log-text">0233 KT8K 599 022
+      </p>
+  </div>
+  <label for="callsign">Call</label>
+  <input type="text" id="callsign" class="qso-input">
+  <label for="rst">RST</label>
+  <input type="text" id="rst" class="qso-input">
+   <label for="number">NR</label>
+  <input type="text" id="number" class="qso-input">
+  <br>
+  <button type="button" id="f1" class="fkey-button">F1 CQ</button>
+  <button type="button" id="f2" class="fkey-button">F2 &lt;#&gt;</button>
+  <button type="button" id="f3" class="fkey-button">F3 TU</button>
+  <button type="button" id="f4" class="fkey-button">F4 &lt;my&gt;</button>
+  <button type="button" id="f5" class="fkey-button">F5 &lt;his&gt;</button>
+  <button type="button" id="f6" class="fkey-button">F6 B4</button>
+  <button type="button" id="f7" class="fkey-button">F7 ?</button>
+  <button type="button" id="f8" class="fkey-button">F8 NIL<my></button>
+  <p>
+    <div id="knobs">
+      <label for="af-gain">AF Gain</label><br>
+      <input id="af-gain" class="knob" data-width="100" data-height="100"
+       data-cursor=false data-fgColor="#883300" data-thickness=.4 value="100">
+
+      <label for="mon-gain">Mon Gain</label><br>
+      <input id="mon-gain" class="knob" data-width="100" data-height="100"
+       data-cursor=false data-fgColor="#4444ff" data-thickness=.4 value="50">
+
+      <label for="cw-pitch">CW Pitch</label><br>
+      <input id="cw-pitch" class="knob" data-width="100" data-height="100"
+       data-cursor=false data-fgColor="#ff44ff" data-thickness=.4 value="500"
+       data-min="100", data-max="1000">
+
+      <label for="filter-bw">Bandwidth</label><br>
+      <input id="filter-bw" class="knob" data-width="100" data-height="100"
+        data-cursor=false data-fgColor="#ff44ff" data-thickness=.4 value="500"
+        data-min="100", data-max="600" data-step="1">
+    </div>
+  <div id="bottom">
+    <button type="button" id="run-button">Run</button>
+  </div>
+  <br>
+</body>
+
+</html>
