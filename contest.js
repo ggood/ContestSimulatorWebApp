@@ -4,9 +4,6 @@ var Contest = function() {
 
   this.isRunning = false;
 
-  // My station
-  this.myStation = new Station("KM6I", context.destination);  // TODO remove hardconded callsign
-
   // Audio elements in signal chain
   // Pink noise source for background noise
   this.backgroundNoise = new NoiseSource();
@@ -24,6 +21,9 @@ var Contest = function() {
   // Master gain
   this.masterGain = context.createGain();
   this.masterGain.gain.value = 1.0;
+
+  // My station
+  this.myStation = new Station("KM6I", this.masterGain);  // TODO remove hardconded callsign
 
   console.log("Contest instance created");
 };
@@ -47,9 +47,17 @@ Contest.prototype.setFilterFrequency = function(value) {
   this.lpFilter2.frequency.value = value;
 };
 
-Contest.prototype.setFilterQ = function(value) {
-  this.lpFilter1.Q.value = value;
-  this.lpFilter2.Q.value = value;
+Contest.prototype.setFilterBandwidth = function(value) {
+  /*
+   This conversion from bandwidth to Q us completely
+   bogus and is just based on ear. Do the math at some point.
+   */
+  // Map 100->600 Hz to 10.0->2.5 Q (not inversion)
+  q = 10 - (((value - 100.0) * (10 - 2.5)) / (600 - 100));
+
+  console.log("setting q to " + q);
+  this.lpFilter1.Q.value = q;
+  this.lpFilter2.Q.value = q;
 };
 
 Contest.prototype.setVolume = function(value) {

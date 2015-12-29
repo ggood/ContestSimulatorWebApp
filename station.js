@@ -1,6 +1,6 @@
 // Morse constants
 var INTER_CHARACTER = 2.5
-var RAMP = 0.001
+var RAMP = 0.005
 
 var Station = function(callSign, audioSink) {
   // Station configuration
@@ -14,7 +14,7 @@ var Station = function(callSign, audioSink) {
   this.voiceOsc.type = 'sine';
   this.voiceOsc.frequency.value = 100 + Math.random() * 900;
   this.voiceOsc.start();
-  // Goin contain is used to generate keying envelope and for overall
+  // Gain control is used to generate keying envelope and for overall
   // goin. TODO(ggood) QSB will be easier to implement if the keying
   // gain control is separate from the overall station gain.
   this.gainAndEnvelope = context.createGain();
@@ -23,6 +23,14 @@ var Station = function(callSign, audioSink) {
   this.voiceOsc.connect(this.gainAndEnvelope);
   // TODO(ggood) should we only connect when sending?
   this.gainAndEnvelope.connect(this.audioSink);
+
+  // If set, we will mute this audio gain node when sending
+  this.rMixer = null;
+
+};
+
+Station.prototype.setRxMixer = function(mixer) {
+  this.rxMixer = mixer;
 };
 
 Station.prototype.setPitch = function(pitch) {
@@ -47,7 +55,7 @@ Station.prototype.sendExchange = function() {
  Send my callsign
  */
 Station.prototype.sendCallSign = function() {
-  this.send((this.callSign + " ").repeat(20));
+  this.send(this.callSign);
 };
 
 /*

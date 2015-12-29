@@ -28,25 +28,33 @@
    <label for="number">NR</label>
   <input type="text" id="number" class="qso-input">
   <br>
-  <button type="button" id="f1" class="fkey-button">F1</button>
-  <button type="button" id="f2" class="fkey-button">F2</button>
-  <button type="button" id="f3" class="fkey-button">F3</button>
-  <button type="button" id="f4" class="fkey-button">F4</button>
+  <button type="button" id="f1" class="fkey-button">F1 CQ</button>
+  <button type="button" id="f2" class="fkey-button">F2 &lt;#&gt;</button>
+  <button type="button" id="f3" class="fkey-button">F3 TU</button>
+  <button type="button" id="f4" class="fkey-button">F4 &lt;my&gt;</button>
+  <button type="button" id="f5" class="fkey-button">F5 &lt;his&gt;</button>
+  <button type="button" id="f6" class="fkey-button">F6 B4</button>
+  <button type="button" id="f7" class="fkey-button">F7 ?</button>
+  <button type="button" id="f8" class="fkey-button">F8 NIL<my></button>
   <p>
     <div id="knobs">
-      <input id="af-gain" class="knob" data-width="80"
+      <label for="af-gain">AF Gain</label><br>
+      <input id="af-gain" class="knob" data-width="100" data-height="100"
        data-cursor=false data-fgColor="#883300" data-thickness=.4 value="100">
-      <input id="mon-gain" class="knob" data-width="80"
+
+      <label for="mon-gain">Mon Gain</label><br>
+      <input id="mon-gain" class="knob" data-width="100" data-height="100"
        data-cursor=false data-fgColor="#4444ff" data-thickness=.4 value="50">
-      <input id="cw-pitch" class="knob" data-width="80"
+
+      <label for="cw-pitch">CW Pitch</label><br>
+      <input id="cw-pitch" class="knob" data-width="100" data-height="100"
        data-cursor=false data-fgColor="#ff44ff" data-thickness=.4 value="500"
        data-min="100", data-max="1000">
-      <input id="filter-frequency" class="knob" data-width="80"
+
+      <label for="filter-bw">Bandwidth</label><br>
+      <input id="filter-bw" class="knob" data-width="100" data-height="100"
         data-cursor=false data-fgColor="#ff44ff" data-thickness=.4 value="500"
-        data-min="100", data-max="2100">
-      <input id="filter-q" class="knob" data-width="80"
-        data-cursor=false data-fgColor="#ff44ff" data-thickness=.4 value="500"
-        data-min="0", data-max="1000" data-step="1">
+        data-min="100", data-max="600" data-step="1">
     </div>
   <div id="bottom">
     <button type="button" id="run-button">Run</button>
