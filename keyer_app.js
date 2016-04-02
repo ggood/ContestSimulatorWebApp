@@ -29,6 +29,10 @@ $(function() {
 
   $("#send").click(function() {
     console.log("Click")
-    keyer.send(document.getElementById("send_text").value);
+    if (keyer.isSending()) {
+        console.log("Can't send now, keyer sending");
+    } else {
+        keyer.send(document.getElementById("send_text").value);
+    }
   });
 });

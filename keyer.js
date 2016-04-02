@@ -1,11 +1,22 @@
 // Morse constants
-var INTER_CHARACTER = 2.5
+var INTER_CHARACTER = 2.5  // Time between letters
+var INTER_WORD = 3.5  // Time between words
 var RAMP = 0.010
+
+function wpmToElementDuration(wpm) {
+  // Based on CODEX (60000 ms per minute / W * 60 dit values in CODEX)
+  return 1.0 / wpm;
+};
 
 var Keyer = function(audioSink) {
   // Keyer configuration
-  this.elementDuration = 0.04;  // TODO use WPM
+  this.speed = 25;  // in wpm
+  this.elementDuration = wpmToElementDuration(this.speed);
   this.audioSink = audioSink;
+
+  // Message sending state
+  // Largest time at which we've scheduled an audio event
+  this.latestScheduledEventTime = 0;
 
   // Signal chain
   this.voiceOsc = context.createOscillator();
@@ -29,8 +40,21 @@ Keyer.prototype.setPitch = function(pitch) {
 };
 
 
-Keyer.prototype.setMonitorGain = function(value) {
-  this.monitorGain.gain.value = value;
+Keyer.prototype.setMonitorGain = function(gain) {
+  this.monitorGain.gain.value = gain;
+};
+
+
+Keyer.prototype.setSpeed = function(wpm) {
+  this.speed = wpm;
+  this.elementDuration = wpmToElementDuration(this.speed);
+};
+
+
+Keyer.prototype.isSending = function() {
+  console.log("this.latestScheduledEventTime = " + this.latestScheduledEventTime);
+  console.log("context.currentTime = " + context.currentTime);
+  return (this.latestScheduledEventTime > context.currentTime);
 };
 
 
@@ -38,6 +62,7 @@ Keyer.prototype.setMonitorGain = function(value) {
  Send the given text.
  */
 Keyer.prototype.send = function(text) {
+  var self = this
 
   // Send morse
   var timeOffset = context.currentTime
@@ -55,6 +80,9 @@ Keyer.prototype.send = function(text) {
     gainNode.linearRampToValueAtTime(0.0, timeOffset);
     timeOffset += elementDuration;
     gainNode.linearRampToValueAtTime(0.0, timeOffset);
+
+    // Remember this time
+    self.latestScheduledEventTime = timeOffset;
   }
 
   function dash(gainNode, elementDuration) {
@@ -69,14 +97,31 @@ Keyer.prototype.send = function(text) {
     gainNode.linearRampToValueAtTime(0.0, timeOffset);
     timeOffset += elementDuration;
     gainNode.linearRampToValueAtTime(0.0, timeOffset);
+
+    // Remember this time
+    self.latestScheduledEventTime = timeOffset;
   }
 
-  function space(gainNode, elementDuration) {
-    // Wait 3 units
+  function letter_space(gainNode, elementDuration) {
+    // Wait INTER_CHARACTER units
     timeOffset += RAMP;
     gainNode.linearRampToValueAtTime(0.0, timeOffset);
     timeOffset += INTER_CHARACTER * elementDuration;
     gainNode.linearRampToValueAtTime(0.0, timeOffset);
+
+    // Remember this time
+    self.latestScheduledEventTime = timeOffset;
+  }
+
+  function word_space(gainNode, elementDuration) {
+    // Wait INTER_WORD units
+    timeOffset += RAMP;
+    gainNode.linearRampToValueAtTime(0.0, timeOffset);
+    timeOffset += INTER_WORD * elementDuration;
+    gainNode.linearRampToValueAtTime(0.0, timeOffset);
+
+    // Remember this time
+    self.latestScheduledEventTime = timeOffset;
   }
 
   console.log("Sending " + text);
@@ -86,10 +131,13 @@ Keyer.prototype.send = function(text) {
   for (var i = 0, len = text.length; i < len; i++) {
     morseLetters.push(toMorse(text[i]));
   }
-  morseString = morseLetters.join(" ");
+  morseString = morseLetters.join("S");
 
   this.envelopeGain.gain.linearRampToValueAtTime(0, timeOffset);
 
+  // TODO(ggood) instead of scheduling all of the events here, only
+  // schedule up to, say, 500 milliseconds into the future, and schedule
+  // a callback in which we will schedule another 500 ms, etc.
   for (var i = 0, len = morseString.length; i < len; i++) {
     switch (morseString[i]) {
       case ".":
@@ -98,8 +146,11 @@ Keyer.prototype.send = function(text) {
       case "-":
         dash(this.envelopeGain.gain, this.elementDuration);
         break;
-      case " ":
-        space(this.envelopeGain.gain, this.elementDuration);
+      case "S":
+        letter_space(this.envelopeGain.gain, this.elementDuration);
+        break;
+      case "W":
+        word_space(this.envelopeGain.gain, this.elementDuration);
         break;
       default:
         break;
@@ -148,6 +199,7 @@ Keyer.prototype.send = function(text) {
       "/": "-..-.",
       ".": ".-.-.-",
       ",": "--..--",
+      " ": "W",
     }
     char = char.toLowerCase()
     if (char in morseMap) {
