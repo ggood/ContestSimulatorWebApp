@@ -35,4 +35,8 @@ $(function() {
         keyer.send(document.getElementById("send_text").value);
     }
   });
+
+  $("#cancel").click(function() {
+    keyer.abortMessage();
+  });
 });

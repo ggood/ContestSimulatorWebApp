@@ -58,6 +58,13 @@ Keyer.prototype.isSending = function() {
 };
 
 
+Keyer.prototype.abortMessage = function() {
+  console.log("STOP SENDING");
+  this.latestScheduledEventTime = 0.0;
+  this.monitorGain.gain.cancelScheduledValues(context.currentTime);
+};
+
+
 /*
  Send the given text.
  */
