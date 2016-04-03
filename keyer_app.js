@@ -39,4 +39,18 @@ $(function() {
   $("#cancel").click(function() {
     keyer.abortMessage();
   });
+
+  $("#pitch").on('input', function() {
+    newPitch = $('#pitch').val();
+    if (!isNaN(newPitch)) {
+      keyer.setPitch(newPitch);
+    }
+  });
+
+  $("#speed").on('input', function() {
+    newSpeed = $('#speed').val();
+    if (!isNaN(newSpeed)) {
+      keyer.setSpeed(newSpeed);
+    }
+  });
 });
