@@ -32,6 +32,7 @@ var Keyer = function(audioSink) {
   this.voiceOsc.connect(this.envelopeGain);
   this.envelopeGain.connect(this.monitorGain);
   this.monitorGain.connect(this.audioSink);
+
 };
 
 
@@ -60,8 +61,11 @@ Keyer.prototype.isSending = function() {
 
 Keyer.prototype.abortMessage = function() {
   console.log("STOP SENDING");
+  //this.envelopeGain.gain.cancelScheduledValues(context.currentTime);
+  this.envelopeGain.gain.cancelScheduledValues(this.startTime);
+  this.envelopeGain.gain.linearRampToValueAtTime(0.0, context.currentTime + RAMP);
   this.latestScheduledEventTime = 0.0;
-  this.monitorGain.gain.cancelScheduledValues(context.currentTime);
+  
 };
 
 
@@ -73,6 +77,7 @@ Keyer.prototype.send = function(text) {
 
   // Send morse
   var timeOffset = context.currentTime
+  this.startTime = timeOffset
 
   // Morse sending functions
   function dot(gainNode, elementDuration) {
