@@ -1,9 +1,25 @@
+/*
+
+ A morse code keyer, based on HTML5 audio.
+
+ Gordon Good velo27 [at] yahoo [dot] com
+
+ License: None; use as you wish
+
+ Limitations:
+   - Schedules all audio events up front. This means the speed cannot
+     be changed after the send method is called.
+
+ */
+
 // Morse constants
 var INTER_CHARACTER = 2.5  // Time between letters
 var INTER_WORD = 3.5  // Time between words
 var RAMP = 0.010
 
 function wpmToElementDuration(wpm) {
+  // Convert a words-per-minute value to an element duration, expressed
+  // in seconds.
   // Based on CODEX (60000 ms per minute / W * 60 dit values in CODEX)
   return 1.0 / wpm;
 };
@@ -18,7 +34,7 @@ var Keyer = function(audioSink) {
   // Largest time at which we've scheduled an audio event
   this.latestScheduledEventTime = 0;
 
-  // Signal chain
+  // Signal chain; oscillator -> gain (keying) -> gain (monitor volume)
   this.voiceOsc = context.createOscillator();
   this.voiceOsc.type = 'sine';
   this.voiceOsc.frequency.value = 500;
@@ -53,15 +69,11 @@ Keyer.prototype.setSpeed = function(wpm) {
 
 
 Keyer.prototype.isSending = function() {
-  console.log("this.latestScheduledEventTime = " + this.latestScheduledEventTime);
-  console.log("context.currentTime = " + context.currentTime);
   return (this.latestScheduledEventTime > context.currentTime);
 };
 
 
 Keyer.prototype.abortMessage = function() {
-  console.log("STOP SENDING");
-  //this.envelopeGain.gain.cancelScheduledValues(context.currentTime);
   this.envelopeGain.gain.cancelScheduledValues(this.startTime);
   this.envelopeGain.gain.linearRampToValueAtTime(0.0, context.currentTime + RAMP);
   this.latestScheduledEventTime = 0.0;
@@ -135,8 +147,6 @@ Keyer.prototype.send = function(text) {
     // Remember this time
     self.latestScheduledEventTime = timeOffset;
   }
-
-  console.log("Sending " + text);
 
   // Convert text to string representing morse dots and dashes
   var morseLetters = []
