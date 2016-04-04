@@ -1,0 +1,42 @@
+<html>
+
+<head>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script src="http://anthonyterrien.com/js/jquery.knob.js"></script>
+<link rel="stylesheet" type="text/css" href="callsign_copier.css" media="screen" />
+  <script src="keyer.js"></script>
+  <script src="callsign_copier_app.js"></script>
+
+</head>
+
+<body>
+  <div id="outerPanel" class="outer-panel">
+    <div id="logPanel" class="inner-panel">
+      <textarea id="log" class="log" readonly="true">Copied    Actual</textarea>
+    </div>
+    <div id="inputPanel" class="inner-panel">
+      Callsign
+      <input type="text" id="callsign" class="qso-input"></input>
+
+      <br>
+
+      <input id="cw-speed" class="dial"
+       data-cursor=true data-fgColor="#ff44fe"
+       data-thickness=.4 data-width="100" data-height="100",
+       value="24" data-min="3", data-max="60">
+
+      <input id="cw-pitch" class="dial"
+       data-cursor=true data-fgColor="#ff44ff"
+       data-thickness=.4 data-width="100" data-height="100",
+       value="500" data-min="100", data-max="1000">
+    </div>
+
+    <div id="buttonsPanel" class="inner-panel">
+      <button type="button" id="start" class="action-button">Start</button>
+      <button type="button" id="end" class="action-button">End</button>
+    </div>
+  </div>
+</body>
+
+</html>

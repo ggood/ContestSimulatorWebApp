@@ -1,0 +1,73 @@
+* {
+  font-family: sans-serif;
+  font-size: small;
+  box-sizing: border-box;
+}
+
+.outer-panel {
+  border-width: 1px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: auto;
+  width: 400px;
+}
+
+.inner-panel {
+  border-width: 0px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: auto;
+  width: auto;
+}
+
+.dial {
+  data-width: 400;
+  data-thickness: 8;
+  data-fgColor: #000000
+}
+
+.dial {
+  font-size: 10px !important;
+}
+
+#log {
+  height: 100px;
+  width: 100%;
+  overflow: scroll;
+  font-family: Courier;
+}
+
+#run-button {
+  font-size: large;
+  background-color: #4df;
+  width: 80px;
+  height: 30px;
+}
+body {
+  font-size: large;
+}
+
+.fkey-button {
+  font-size: small;
+  background-color: #999;
+  width: 80px;
+  height: 30px;
+}
+
+.action-button {
+  font-size: small;
+  background-color: #999;
+  width: 80px;
+  height: 30px;
+}
+
+.qso-input {
+  height: 30px;
+  font-size: large;
+  text-transform: uppercase;
+}
+
