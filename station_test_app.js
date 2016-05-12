@@ -25,6 +25,7 @@ return  window.requestAnimationFrame       ||
 
 var stn1 = new Station("F5IN", context.destination);
 var stn2 = new Station("W6YX", context.destination);
+var noise = new NoiseSource(context.destination);
 
 setPitch = function(newPitch, station) {
   if (!isNaN(newPitch)) {
@@ -45,6 +46,13 @@ setGain = function(newGain, station) {
   }
 }
 
+setNoiseGain = function(newGain) {
+  if (!isNaN(newGain)) {
+    newGain = newGain / 100.0;
+    noise.setGain(newGain);
+  }
+}
+
 $( document ).ready(function() {
   console.log("READY");
   setPitch($('#pitch1').val(), stn1);
@@ -54,6 +62,8 @@ $( document ).ready(function() {
   setPitch($('#pitch2').val(), stn2);
   setSpeed($('#speed2').val(), stn2);
   setGain($('#gain2').val(), stn2);
+
+  setNoiseGain($('#noise_gain').val());
 });
 
 $(function() {
@@ -105,11 +115,32 @@ $(function() {
 
   $("#gain1").on('input', function() {
     newgain = $('#gain1').val();
+    if (newGain > 100) {
+      newGain = 100;
+      $("#gain1").val(newGain);
+    }
     setGain(newgain, stn1);
   });
 
   $("#gain2").on('input', function() {
     newGain = $('#gain2').val();
+    if (newGain > 100) {
+      newGain = 100;
+      $("#gain2").val(newGain);
+    }
     setGain(newGain, stn2);
+  });
+
+  $("#noise").change(function() {
+    noise.setEnabled(this.checked);
+  });
+
+  $("#noise_gain").on('input', function() {
+    newGain = $('#noise_gain').val();
+    if (newGain > 100) {
+      newGain = 100;
+      $("#noise_gain").val(newGain);
+    }
+    setNoiseGain(newGain);
   });
 });
