@@ -114,7 +114,7 @@ $(function() {
   });
 
   $("#gain1").on('input', function() {
-    newgain = $('#gain1').val();
+    newGain = $('#gain1').val();
     if (newGain > 100) {
       newGain = 100;
       $("#gain1").val(newGain);
