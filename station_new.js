@@ -24,8 +24,16 @@ Station.prototype.setFrequency = function(frequency) {
   this.frequency = frequency;
 };
 
+Station.prototype.getFrequency = function() {
+  return this.frequency;
+};
+
 Station.prototype.setExchange = function(exchange) {
   this.exchange = exchange;
+};
+
+Station.prototype.getCallsign = function() {
+  return this.callSign;
 };
 
 /*

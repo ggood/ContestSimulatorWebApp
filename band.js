@@ -18,26 +18,27 @@
 
   Band frequencies are in Hz offset from 0
  */
-var Band = function(bandName, audioSink) {
+var Band = function(bandName) {
   this.bandName = bandName;
-  this.audioSink = audioSink;
+  this.gainNode = context.createGain();
+  this.gainNode.gain.value = 1.0;
 
-  this.noiseSource = new NoiseSource(this.audioSink);
+  this.noiseSource = new NoiseSource(this.gainNode);
   // TODO(ggood) add QRN source
   this.listenFrequency = 5000;
 
   const BAND_UPPER_FREQ = 10000;  // 10 KHz for now...
   this.stations = [];
   // TODO(ggood) remove hordcoded stations
-  this.stations.push(new Station("N6RO", this.audioSink));
-  this.stations.push(new Station("W6YX", this.audioSink));
-  this.stations.push(new Station("W6SX", this.audioSink));
-  this.stations.push(new Station("K9YC", this.audioSink));
-  this.stations.push(new Station("K6XX", this.audioSink));
-  this.stations.push(new Station("W7RN", this.audioSink));
-  this.stations.push(new Station("N6TX", this.audioSink));
-  this.stations.push(new Station("N5KO", this.audioSink));
-  this.stations.push(new Station("W6OAT", this.audioSink));
+  this.stations.push(new Station("N6RO", this.gainNode));
+  this.stations.push(new Station("W6YX", this.gainNode));
+  this.stations.push(new Station("W6SX", this.gainNode));
+  this.stations.push(new Station("K9YC", this.gainNode));
+  this.stations.push(new Station("K6XX", this.gainNode));
+  this.stations.push(new Station("W7RN", this.gainNode));
+  this.stations.push(new Station("N6TX", this.gainNode));
+  this.stations.push(new Station("N5KO", this.gainNode));
+  this.stations.push(new Station("W6OAT", this.gainNode));
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].setFrequency(i * 1000);   // for now, uniform spacing
 }
@@ -47,8 +48,15 @@ var Band = function(bandName, audioSink) {
 Band.prototype.setListenFrequency = function(value) {
   this.listenFrequency = value;
   console.log("Band " + this.bandName + " set to offset " + this.listenFrequency);
-  // TODO(ggood):
-  // based on maximum rx bandwith and rx freq, figure out which stations
-  // can be heard and enable only them. Then calculate the expected sidetone
-  // from each and update the station objects.
+  for (var i = 0; i < this.stations.length; i++) {
+    station = this.stations[i];
+    offset = station.getFrequency() - this.listenFrequency;
+    if (offset > 0 && offset < 2000) {
+      console.log("Station " + station.getCallsign() + " offset " + offset);
+    }
+  }
+}
+
+Band.prototype.radioConnected = function(audioSink) {
+  this.gainNode.connect(audioSink);
 }

@@ -11,6 +11,7 @@
   - filter bandwidth
  */
 var Radio = function(audioSink) {
+  this.audioSink = audioSink;
   this.band = null;  // If not tuned to a band, no audio is produced
   // AF Gain setup
   this.afGain = context.createGain();
@@ -41,8 +42,23 @@ Radio.prototype.setFilterBandwidth = function(value) {
   // Map 100->600 Hz to 10.0->2.5 Q (not inversion)
   q = 10 - (((value - 100.0) * (10 - 2.5)) / (600 - 100));
   this.bpFilter.Q.value = q;
+  console.log("Set filter Q to " + q);
 };
 
 Radio.prototype.setFilterFrequency = function(value) {
-  his.bpFilter.frequency.value = value;
+  this.bpFilter.frequency.value = value;
+  console.log("Set filter frequency to " + value);
 };
+
+Radio.prototype.setBand = function(value) {
+  this.band = value;
+  this.band.radioConnected(this.bpFilter);
+};
+
+Radio.prototype.setFrequency = function(value) {
+  if (this.band == null) {
+    console.log("Radio: not connected to a band, ignoring frequency change")
+    return;
+  }
+  this.band.setListenFrequency(value);
+}
