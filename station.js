@@ -8,6 +8,7 @@ var Station = function(callSign, audioSink) {
   this.elementDuration = 0.04;  // TODO use WPM
   this.stationGain = 1.0;
   this.audioSink = audioSink;
+  this.repeatDelay = -1.0;  // in milliseconds
 
   // Signal chain
   this.voiceOsc = context.createOscillator();
@@ -37,10 +38,15 @@ Station.prototype.setPitch = function(pitch) {
   this.voiceOsc.frequency.value = pitch;
 };
 
+Station.prototype.getCallSign = function() {
+  return this.callSign;
+};
+
 /*
  Send a CQ
  */
 Station.prototype.callCq = function() {
+  console.log("Station " + this.callSign + " instructed to send cq");
   this.send("cq test " + this.callSign + " " + this.callSign);
 };
 
@@ -64,6 +70,10 @@ Station.prototype.sendCallSign = function() {
 Station.prototype.sendTU = function() {
   this.send("tu " + this.callSign);
 };
+
+Station.prototype.setRepeatDelay = function(delay) {
+  this.repeatDelay = delay;
+}
 
 /*
  Send the given text.
@@ -135,6 +145,11 @@ Station.prototype.send = function(text) {
       default:
         break;
     }
+  }
+
+  if (this.repeatDelay > 0.0) {
+    // Arrange to send again in the future
+    setTimeout(this.send(text), this.repeatDelay);
   }
 
   function toMorse(char) {

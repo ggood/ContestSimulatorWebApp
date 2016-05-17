@@ -24,9 +24,8 @@ return  window.requestAnimationFrame       ||
 // end cross-platform bulletproofing
 
 
-var radio1 = new Radio(context.destination);
+var radio1 = new Radio();
 var band1 = new Band("40m");
-radio1.setBand(band1);
 
 setFrequency = function(newFrequency, radio) {
   if (!isNaN(newFrequency)) {
@@ -69,6 +68,9 @@ $(function() {
 
   $("#start").click(function() {
     console.log("Start simulation");
+    context = new (window.AudioContext || window.webkitAudioContext)
+    radio1.setAudioSink(context.destination);
+    radio1.setBand(band1);
   });
 
   $("#stop").click(function() {

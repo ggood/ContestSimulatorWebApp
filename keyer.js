@@ -27,6 +27,7 @@ function wpmToElementDuration(wpm) {
 var Keyer = function(audioSink) {
   // Keyer configuration
   this.speed = 25;  // in wpm
+  this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
   this.elementDuration = wpmToElementDuration(this.speed);
   this.audioSink = audioSink;
 
@@ -77,19 +78,30 @@ Keyer.prototype.abortMessage = function() {
   this.envelopeGain.gain.cancelScheduledValues(this.startTime);
   this.envelopeGain.gain.linearRampToValueAtTime(0.0, context.currentTime + RAMP);
   this.latestScheduledEventTime = 0.0;
-  
+
 };
 
+Keyer.prototype.setRepeatInterval = function(interval) {
+  this.repeatInterval = interval;
+  console.log("Keyer: repeating every " + interval + " seconds");
+};
+
+
+Keyer.prototype.blab = function(text) {
+  console.log("Keyer.blab(" + text + ") called at " + context.currentTime);
+};
 
 /*
  Send the given text.
  */
 Keyer.prototype.send = function(text) {
-  var self = this
+  var self = this;
+
+  console.log("Keyer: sending " + text);
 
   // Send morse
-  var timeOffset = context.currentTime
-  this.startTime = timeOffset
+  var timeOffset = context.currentTime;
+  this.startTime = timeOffset;
 
   // Morse sending functions
   function dot(gainNode, elementDuration) {
@@ -177,6 +189,15 @@ Keyer.prototype.send = function(text) {
       default:
         break;
     }
+  }
+
+  if (this.repeatInterval > 0.0) {
+    // Arrange to send again in the future
+    var delay =  ((self.latestScheduledEventTime + this.repeatInterval - context.currentTime) * 1000);
+    // The following bind() call creates a new function with the "this" bound
+    // to the "this" in this context. We need to do this so we have all of
+    // the current context in the future invocation.
+    setTimeout(this.send.bind(this, text), delay);
   }
 
   function toMorse(char) {

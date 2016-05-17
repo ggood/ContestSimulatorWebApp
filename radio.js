@@ -10,13 +10,17 @@
   - af gain
   - filter bandwidth
  */
-var Radio = function(audioSink) {
-  this.audioSink = audioSink;
+var Radio = function() {
+  this.audioSink = null;
   this.band = null;  // If not tuned to a band, no audio is produced
+};
+
+Radio.prototype.setAudioSink = function(audioSink) {
+  this.audioSink = audioSink;
   // AF Gain setup
   this.afGain = context.createGain();
   this.afGain.gain.value = 1.0;  // Unity gain
-  this.afGain.connect(this.audioSink);  // AF gain
+  this.afGain.connect(this.audioSink);
   // Filter setup
   this.filterBw = 500;  // Default filter bandwidth
   // Bandpass filter chain
@@ -26,6 +30,7 @@ var Radio = function(audioSink) {
   this.bpFilter.Q.value = 3.0;  // Default Q
   this.bpFilter.frequency.value = 600;  // Default center frequency
 
+  console.log("Radio: audioSink set");
 };
 
 Radio.prototype.setAFGain = function(value) {
@@ -61,4 +66,4 @@ Radio.prototype.setFrequency = function(value) {
     return;
   }
   this.band.setListenFrequency(value);
-}
+};

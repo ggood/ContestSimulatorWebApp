@@ -20,8 +20,25 @@
  */
 var Band = function(bandName) {
   this.bandName = bandName;
+};
+
+Band.prototype.setListenFrequency = function(value) {
+  this.listenFrequency = value;
+  console.log("Band " + this.bandName + " set to offset " + this.listenFrequency);
+  for (var i = 0; i < this.stations.length; i++) {
+    station = this.stations[i];
+    offset = station.getFrequency() - this.listenFrequency;
+    if (offset > 0 && offset < 2000) {
+      console.log("Station " + station.getCallsign() + " offset " + offset);
+      station.keyer.setPitch(offset);
+    }
+  }
+}
+
+Band.prototype.radioConnected = function(audioSink) {
   this.gainNode = context.createGain();
   this.gainNode.gain.value = 1.0;
+  this.gainNode.connect(audioSink);
 
   this.noiseSource = new NoiseSource(this.gainNode);
   // TODO(ggood) add QRN source
@@ -41,22 +58,7 @@ var Band = function(bandName) {
   this.stations.push(new Station("W6OAT", this.gainNode));
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].setFrequency(i * 1000);   // for now, uniform spacing
-}
-
-};
-
-Band.prototype.setListenFrequency = function(value) {
-  this.listenFrequency = value;
-  console.log("Band " + this.bandName + " set to offset " + this.listenFrequency);
-  for (var i = 0; i < this.stations.length; i++) {
-    station = this.stations[i];
-    offset = station.getFrequency() - this.listenFrequency;
-    if (offset > 0 && offset < 2000) {
-      console.log("Station " + station.getCallsign() + " offset " + offset);
-    }
+    this.stations[i].keyer.setRepeatInterval(1.0);
+    this.stations[i].callCq();
   }
-}
-
-Band.prototype.radioConnected = function(audioSink) {
-  this.gainNode.connect(audioSink);
 }
