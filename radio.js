@@ -57,7 +57,8 @@ Radio.prototype.setFilterFrequency = function(value) {
 
 Radio.prototype.setBand = function(value) {
   this.band = value;
-  this.band.radioConnected(this.bpFilter);
+  //this.band.radioConnected(this.bpFilter);
+  this.band.radioConnected(this.audioSink);
 };
 
 Radio.prototype.setFrequency = function(value) {
@@ -67,3 +68,7 @@ Radio.prototype.setFrequency = function(value) {
   }
   this.band.setListenFrequency(value);
 };
+
+Radio.prototype.stop = function(value) {
+  this.band.radioDisconnected();
+}

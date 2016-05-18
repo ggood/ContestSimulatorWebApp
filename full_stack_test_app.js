@@ -71,15 +71,29 @@ $(function() {
     context = new (window.AudioContext || window.webkitAudioContext)
     radio1.setAudioSink(context.destination);
     radio1.setBand(band1);
+    band1.setListenFrequency(0);
   });
 
   $("#stop").click(function() {
     console.log("Stop simulation");
+    radio1.stop();
   });
 
   $("#frequency").on('input', function() {
     newFrequency = $('#frequency').val();
     setFrequency(newFrequency, radio1);
+  });
+
+  $("#frequency").keyup(function(e) {
+    frequency = parseInt($('#frequency').val());
+    if (e.which == 38) {
+      // up arrow
+      frequency = Math.min(frequency + 25, 10000);
+    } else if (e.which == 40) {
+      frequency = Math.max(frequency - 25, 0);
+    }
+    $('#frequency').val(frequency.toString());
+    setFrequency(frequency, radio1);
   });
 
   $("#gain").on('input', function() {

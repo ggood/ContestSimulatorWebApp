@@ -13,11 +13,15 @@ base frequency. The units are hertz.
 var Station = function(callSign, audioSink) {
   // Station configuration
   this.callSign = callSign;
-  this.keyer = new Keyer(audioSink);
+  this.rfGainControl = context.createGain();
+  this.rfGainControl.gain.value = 0.5;
+  this.rfGainControl.connect(audioSink);
+  this.keyer = new Keyer(this.rfGainControl);
 
   // Station state (may change during contest)
   this.frequency = 0;
   this.exchange = "5nn";
+  this.rfGain = 0.5;
 };
 
 Station.prototype.setFrequency = function(frequency) {
@@ -34,6 +38,23 @@ Station.prototype.setExchange = function(exchange) {
 
 Station.prototype.getCallsign = function() {
   return this.callSign;
+};
+
+Station.prototype.setRfGain = function(gain) {
+  this.rfGain = gain;
+};
+
+Station.prototype.mute = function() {
+  this.rfGainControl.gain.value = 0.0;
+};
+
+Station.prototype.unMute = function() {
+  this.rfGainControl.gain.value = this.rfGain;
+};
+
+Station.prototype.stop = function() {
+  this.keyer.setRepeatInterval(-1.0);
+  this.keyer.abortMessage();
 };
 
 /*
