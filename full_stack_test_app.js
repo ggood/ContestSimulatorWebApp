@@ -71,6 +71,8 @@ $(function() {
     context = new (window.AudioContext || window.webkitAudioContext)
     radio1.setAudioSink(context.destination);
     radio1.setBand(band1);
+    setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
+    setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
     band1.setListenFrequency(0);
   });
 
@@ -108,6 +110,35 @@ $(function() {
   $("#bandwidth").on('input', function() {
     newBandwidth = $('#bandwidth').val();
     setFilterBandwidth(newBandwidth, radio1);
+  });
+
+  $("#bandwidth").keyup(function(e) {
+    bandwidth = parseInt($('#bandwidth').val());
+    if (e.which == 38) {
+      // up arrow
+      bandwidth = Math.min(bandwidth + 25, 2400);
+    } else if (e.which == 40) {
+      bandwidth = Math.max(bandwidth - 25, 100);
+    }
+    $('#bandwidth').val(bandwidth.toString());
+    setFilterBandwidth(bandwidth, radio1);
+  });
+
+  $("#filter_frequency").on('input', function() {
+    newFilterFrequency = $('#filter_frequency').val();
+    setFilterFrequency(newFilterFrequency, radio1);
+  });
+
+  $("#filter_frequency").keyup(function(e) {
+    filter_frequency = parseInt($('#filter_frequency').val());
+    if (e.which == 38) {
+      // up arrow
+      filter_frequency = Math.min(filter_frequency + 25, 1800);
+    } else if (e.which == 40) {
+      filter_frequency = Math.max(filter_frequency - 25, 100);
+    }
+    $('#filter_frequency').val(filter_frequency.toString());
+    setFilterFrequency(filter_frequency, radio1);
   });
 
   $("#noise_gain").on('input', function() {

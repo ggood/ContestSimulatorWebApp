@@ -57,7 +57,7 @@ Band.prototype.radioConnected = function(audioSink) {
   this.stations.push(new Station("K9YC", this.gainNode));
   this.stations.push(new Station("K6XX", this.gainNode));
   this.stations.push(new Station("W7RN", this.gainNode));
-  this.stations.push(new Station("N6TX", this.gainNode));
+  this.stations.push(new Station("N6TV", this.gainNode));
   this.stations.push(new Station("N5KO", this.gainNode));
   this.stations.push(new Station("W6OAT", this.gainNode));
   this.stations.push(new Station("K6RM", this.gainNode));
@@ -73,7 +73,7 @@ Band.prototype.radioConnected = function(audioSink) {
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].setFrequency(Math.random() * 10000);   // for now, uniform spacing
     this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 20);
-    this.stations[i].keyer.setRepeatInterval(Math.random() + 0.5);
+    this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
     this.stations[i].callCq();
   }

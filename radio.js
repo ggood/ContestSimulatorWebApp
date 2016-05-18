@@ -25,12 +25,24 @@ Radio.prototype.setAudioSink = function(audioSink) {
   this.filterBw = 500;  // Default filter bandwidth
   // Bandpass filter chain
   // TODO(ggood) - may need multiple filters in series
-  this.bpFilter = context.createBiquadFilter();
-  this.bpFilter.type = "bandpass";
-  this.bpFilter.Q.value = 3.0;  // Default Q
-  this.bpFilter.frequency.value = 600;  // Default center frequency
+  this.filterBank = [];
+  this.filterBank.push(context.createBiquadFilter());
+  this.filterBank.push(context.createBiquadFilter());
+  this.filterBank.push(context.createBiquadFilter());
+  for (var i = 0; i < this.filterBank.length; i++) {
+    this.filterBank[i].type = "bandpass";
+    this.filterBank[i].Q.value = 3.0;  // Default Q
+    this.filterBank[i].frequency.value = 600;  // Default center frequency
+  }
+  for (var i = 0; i < this.filterBank.length; i++) {
+    if (i < this.filterBank.length - 1) {
+      this.filterBank[i].connect(this.filterBank[i + 1]);
+    } else {
+      this.filterBank[i].connect(this.afGain);
+    }
+  }
 
-  console.log("Radio: audioSink set");
+  console.log("Radio: initialized");
 };
 
 Radio.prototype.setAFGain = function(value) {
@@ -45,20 +57,25 @@ Radio.prototype.setFilterBandwidth = function(value) {
    bogus and is just based on ear. Do the math at some point.
    */
   // Map 100->600 Hz to 10.0->2.5 Q (not inversion)
+  console.log("Set filter bw to " + value);
   q = 10 - (((value - 100.0) * (10 - 2.5)) / (600 - 100));
-  this.bpFilter.Q.value = q;
+  for (var i = 0; i < this.filterBank.length; i++) {
+    this.filterBank[i].Q.value = q;
+  }
   console.log("Set filter Q to " + q);
 };
 
 Radio.prototype.setFilterFrequency = function(value) {
-  this.bpFilter.frequency.value = value;
+  for (var i = 0; i < this.filterBank.length; i++) {
+    this.filterBank[i].frequency.value = value;
+  }
   console.log("Set filter frequency to " + value);
 };
 
 Radio.prototype.setBand = function(value) {
   this.band = value;
-  //this.band.radioConnected(this.bpFilter);
-  this.band.radioConnected(this.audioSink);
+  this.band.radioConnected(this.filterBank[0]);
+  //this.band.radioConnected(this.audioSink);
 };
 
 Radio.prototype.setFrequency = function(value) {
