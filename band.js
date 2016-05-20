@@ -60,16 +60,16 @@ Band.prototype.radioConnected = function(audioSink) {
   this.stations.push(new Station("N6TV", this.gainNode));
   this.stations.push(new Station("N5KO", this.gainNode));
   this.stations.push(new Station("W6OAT", this.gainNode));
-  this.stations.push(new Station("K6RM", this.gainNode));
+  this.stations.push(new Station("W0YK", this.gainNode));
   this.stations.push(new Station("KX7M", this.gainNode));
   this.stations.push(new Station("W1RH", this.gainNode));
-  this.stations.push(new Station("W8UM", this.gainNode));
+  this.stations.push(new Station("W6FB", this.gainNode));
   this.stations.push(new Station("KA3DRR", this.gainNode));
-  this.stations.push(new Station("W8LT", this.gainNode));
-  this.stations.push(new Station("KT8K", this.gainNode));
+  this.stations.push(new Station("K6MM", this.gainNode));
+  this.stations.push(new Station("AE6Y", this.gainNode));
   this.stations.push(new Station("WC6H", this.gainNode));
-  this.stations.push(new Station("K3LR", this.gainNode));
-  this.stations.push(new Station("K5ZD", this.gainNode));
+  this.stations.push(new Station("K5RC", this.gainNode));
+  this.stations.push(new Station("W6JTI", this.gainNode));
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].setFrequency(Math.random() * 10000);   // for now, uniform spacing
     this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 20);

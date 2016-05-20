@@ -57,7 +57,11 @@ var Keyer = function(audioSink) {
 
 
 Keyer.prototype.setPitch = function(pitch) {
-  this.voiceOsc.frequency.value = pitch;
+  // Schedule the frequency change in the future, otherwise
+  // we will hear it sweep from the current to the new
+  // frequency.
+  var now = context.currentTime;
+  this.voiceOsc.frequency.setValueAtTime(pitch, now);
 };
 
 
