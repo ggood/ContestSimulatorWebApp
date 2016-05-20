@@ -55,7 +55,7 @@ setGain = function(newGain, station) {
 setNoiseGain = function(newGain, radio) {
   if (!isNaN(newGain)) {
     newGain = newGain / 100.0;
-    radio.band.setGain(newGain);
+    radio.band.setNoiseGain(newGain);
   }
 }
 
@@ -74,6 +74,7 @@ $(function() {
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
     band1.setListenFrequency(0);
+    band1.setNoiseGain(parseInt($('#noise_gain').val() / 100.0));
   });
 
   $("#stop").click(function() {
@@ -147,6 +148,7 @@ $(function() {
       newGain = 100;
       $("#noise_gain").val(newGain);
     }
-    setNoiseGain(newGain, radio1);
+    band1.setNoiseGain(newGain / 100.0  , radio1);
   });
+
 });

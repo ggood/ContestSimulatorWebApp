@@ -85,3 +85,7 @@ Band.prototype.radioDisconnected = function() {
   }
   this.noiseSource.setEnabled(false);
 }
+
+Band.prototype.setNoiseGain = function(value) {
+  this.noiseSource.setGain(value);
+}
