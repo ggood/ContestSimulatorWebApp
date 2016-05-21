@@ -25,7 +25,9 @@ return  window.requestAnimationFrame       ||
 
 
 var radio1 = new Radio();
+var radio2 = new Radio();
 var band1 = new Band("40m");
+var band2 = new Band("80m");
 
 setFrequency = function(newFrequency, radio) {
   if (!isNaN(newFrequency)) {
@@ -69,17 +71,30 @@ $(function() {
   $("#start").click(function() {
     console.log("Start simulation");
     context = new (window.AudioContext || window.webkitAudioContext)
-    radio1.setAudioSink(context.destination);
+    radio1Pan = context.createStereoPanner();
+    radio1Pan.connect(context.destination);
+    radio1Pan.pan.value = 1.0;
+    radio2Pan = context.createStereoPanner();
+    radio2Pan.connect(context.destination);
+    radio2Pan.pan.value = -1.0;
+    radio1.setAudioSink(radio1Pan);
     radio1.setBand(band1);
+    radio2.setAudioSink(radio2Pan);
+    radio2.setBand(band2);
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
+    setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
+    setFilterFrequency(parseInt($('#filter_frequency2').val()), radio2);
     band1.setListenFrequency(0);
     band1.setNoiseGain(parseInt($('#noise_gain').val() / 100.0));
+    band2.setListenFrequency(0);
+    band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
   });
 
   $("#stop").click(function() {
     console.log("Stop simulation");
     radio1.stop();
+    radio2.stop();
   });
 
   $("#frequency").on('input', function() {

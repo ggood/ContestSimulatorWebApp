@@ -70,9 +70,29 @@ Band.prototype.radioConnected = function(audioSink) {
   this.stations.push(new Station("WC6H", this.gainNode));
   this.stations.push(new Station("K5RC", this.gainNode));
   this.stations.push(new Station("W6JTI", this.gainNode));
+  this.stations.push(new Station("KM6I", this.gainNode));
+  this.stations.push(new Station("KE1B", this.gainNode));
+  this.stations.push(new Station("K6MMM", this.gainNode));
+  this.stations.push(new Station("K6RIM", this.gainNode));
+  this.stations.push(new Station("W6NL", this.gainNode));
+  this.stations.push(new Station("NA6O", this.gainNode));
+  this.stations.push(new Station("K6MR", this.gainNode));
+  this.stations.push(new Station("K6VVA", this.gainNode));
+  this.stations.push(new Station("N6BV", this.gainNode));
+  this.stations.push(new Station("K3EST", this.gainNode));
+  this.stations.push(new Station("N6EE", this.gainNode));
+  this.stations.push(new Station("N6IE", this.gainNode));
+  this.stations.push(new Station("K6MI", this.gainNode));
+  this.stations.push(new Station("N6ML", this.gainNode));
+  this.stations.push(new Station("N6NZ", this.gainNode));
+  this.stations.push(new Station("N6WM", this.gainNode));
+  this.stations.push(new Station("ND2T", this.gainNode));
+  this.stations.push(new Station("W6CT", this.gainNode));
+  this.stations.push(new Station("W6RGG", this.gainNode));
+  this.stations.push(new Station("WA6O", this.gainNode));
   for (var i = 0; i < this.stations.length; i++) {
-    this.stations[i].setFrequency(Math.random() * 10000);   // for now, uniform spacing
-    this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 20);
+    this.stations[i].setFrequency(Math.random() * 10000);
+    this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 30);
     this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
     this.stations[i].callCq();
