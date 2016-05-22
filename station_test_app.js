@@ -119,7 +119,7 @@ $(function() {
       newGain = 100;
       $("#gain1").val(newGain);
     }
-    setGain(newgain, stn1);
+    setGain(newGain, stn1);
   });
 
   $("#gain2").on('input', function() {

@@ -1,0 +1,54 @@
+<html>
+
+<head>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="keyer.js"></script>
+  <script src="noise_new.js"></script>
+  <script src="band.js"></script>
+  <script src="radio.js"></script>
+  <script src="station_new.js"></script>
+  <script src="full_stack_test_app.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="full_stack_test.css">
+
+</head>
+
+<body>
+  <h2>Test: Full App Stack</h2>
+  <div id="radios">
+    <div id="radio1">
+      Tuner Frequency (hz): <input type="text" id="frequency" value="0"> (arrow up/down to change)
+      <br>
+      AF Gain (0-100): <input type="text" id="gain" value="100">
+      <br>
+      RX Bandwidth (100-2000): <input type="text" id="bandwidth" value="500"> (arrow up/down to change)
+      <br>
+      RX Filter Frequency (100-1800): <input type="text" id="filter_frequency" value="700"> (arrow up/down to change)
+      <br>
+      Noise Gain (0-100): <input type="text" id="noise_gain" value="40">
+      <p>
+    </div>
+
+    <div id="radio2">
+      Tuner Frequency (hz): <input type="text" id="frequency2" value="0"> (arrow up/down to change)
+      <br>
+      AF Gain (0-100): <input type="text" id="gain2" value="100">
+      <br>
+      RX Bandwidth (100-2000): <input type="text" id="bandwidth2" value="500"> (arrow up/down to change)
+      <br>
+      RX Filter Frequency (100-1800): <input type="text" id="filter_frequency2" value="700"> (arrow up/down to change)
+      <br>
+      Noise Gain (0-100): <input type="text" id="noise_gain2" value="40">
+      <p>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button type="button" id="start" class="start-button">Start</button>
+    <button type="button" id="stop" class="stop-button">Stop</button>
+  </div>
+
+</body>
+
+</html>
