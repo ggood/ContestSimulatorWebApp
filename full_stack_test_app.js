@@ -47,10 +47,10 @@ setFilterFrequency = function(newFilterFrequency, radio) {
   }
 }
 
-setGain = function(newGain, station) {
+setGain = function(newGain, radio) {
   if (!isNaN(newGain)) {
     newGain = newGain / 100.0;
-    station.keyer.setMonitorGain(newGain);
+    radio.setAFGain(newGain);
   }
 }
 
@@ -67,6 +67,8 @@ $( document ).ready(function() {
 });
 
 $(function() {
+
+  // ========= global controls
 
   $("#start").click(function() {
     console.log("Start simulation");
@@ -96,6 +98,8 @@ $(function() {
     radio1.stop();
     radio2.stop();
   });
+
+  // ========= radio1 controls
 
   $("#frequency").on('input', function() {
     newFrequency = $('#frequency').val();
@@ -164,6 +168,77 @@ $(function() {
       $("#noise_gain").val(newGain);
     }
     band1.setNoiseGain(newGain / 100.0  , radio1);
+  });
+
+  // ========= radio2 controls
+
+  $("#frequency2").on('input', function() {
+    newFrequency = $('#frequency2').val();
+    setFrequency(newFrequency, radio2);
+  });
+
+  $("#frequency2").keyup(function(e) {
+    frequency = parseInt($('#frequency2').val());
+    if (e.which == 38) {
+      // up arrow
+      frequency = Math.min(frequency + 25, 10000);
+    } else if (e.which == 40) {
+      frequency = Math.max(frequency - 25, 0);
+    }
+    $('#frequency2').val(frequency.toString());
+    setFrequency(frequency, radio2);
+  });
+
+  $("#gain2").on('input', function() {
+    newGain = $('#gain2').val();
+    if (newGain > 100) {
+      newGain = 100;
+      $("#gain2").val(newGain);
+    }
+    setGain(newGain, radio2);
+  });
+
+  $("#bandwidth2").on('input', function() {
+    newBandwidth = $('#bandwidth2').val();
+    setFilterBandwidth(newBandwidth, radio2);
+  });
+
+  $("#bandwidth2").keyup(function(e) {
+    bandwidth = parseInt($('#bandwidth2').val());
+    if (e.which == 38) {
+      // up arrow
+      bandwidth = Math.min(bandwidth + 25, 2400);
+    } else if (e.which == 40) {
+      bandwidth = Math.max(bandwidth - 25, 100);
+    }
+    $('#bandwidth2').val(bandwidth.toString());
+    setFilterBandwidth(bandwidth, radio2);
+  });
+
+  $("#filter_frequency2").on('input', function() {
+    newFilterFrequency = $('#filter_frequency2').val();
+    setFilterFrequency(newFilterFrequency, radio2);
+  });
+
+  $("#filter_frequency2").keyup(function(e) {
+    filter_frequency = parseInt($('#filter_frequency2').val());
+    if (e.which == 38) {
+      // up arrow
+      filter_frequency = Math.min(filter_frequency + 25, 1800);
+    } else if (e.which == 40) {
+      filter_frequency = Math.max(filter_frequency - 25, 100);
+    }
+    $('#filter_frequency2').val(filter_frequency.toString());
+    setFilterFrequency(filter_frequency, radio2);
+  });
+
+  $("#noise_gain2").on('input', function() {
+    newGain = $('#noise_gain2').val();
+    if (newGain > 100) {
+      newGain = 100;
+      $("#noise_gain2").val(newGain);
+    }
+    band2.setNoiseGain(newGain / 100.0  , radio2);
   });
 
 });
