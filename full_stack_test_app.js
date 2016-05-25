@@ -28,6 +28,7 @@ var radio1 = new Radio();
 var radio2 = new Radio();
 var band1 = new Band("40m");
 var band2 = new Band("80m");
+var so2rcontroller = new SO2RController();
 
 setFrequency = function(newFrequency, radio) {
   if (!isNaN(newFrequency)) {
@@ -72,21 +73,20 @@ $(function() {
 
   $("#start").click(function() {
     console.log("Start simulation");
-    context = new (window.AudioContext || window.webkitAudioContext)
-    radio1Pan = context.createStereoPanner();
-    radio1Pan.connect(context.destination);
-    radio1Pan.pan.value = -11.0;
-    radio2Pan = context.createStereoPanner();
-    radio2Pan.connect(context.destination);
-    radio2Pan.pan.value = 1.0;
-    radio1.init(context, radio1Pan);
+    context = new (window.AudioContext || window.webkitAudioContext);
+
+    so2rcontroller.init(context, context.destination);
+
+    radio1.init(context, so2rcontroller.getRadio1Input());
     radio1.setBand(band1);
-    radio2.init(context, radio2Pan);
+    radio2.init(context, so2rcontroller.getRadio2Input());
     radio2.setBand(band2);
+
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
     setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
     setFilterFrequency(parseInt($('#filter_frequency2').val()), radio2);
+
     band1.setListenFrequency(0);
     band1.setNoiseGain(parseInt($('#noise_gain').val() / 100.0));
     band2.setListenFrequency(0);
@@ -97,6 +97,21 @@ $(function() {
     console.log("Stop simulation");
     radio1.stop();
     radio2.stop();
+  });
+
+  $("#select-radio1").click(function() {
+    console.log("Select radio 1");
+    so2rcontroller.selectRadio1();
+  });
+
+  $("#select-radio2").click(function() {
+    console.log("Select radio 2");
+    so2rcontroller.selectRadio2();
+  });
+
+  $("#select-both").click(function() {
+    console.log("Select both radios");
+    so2rcontroller.selectBothRadios();
   });
 
   // ========= radio1 controls
