@@ -79,9 +79,9 @@ $(function() {
     radio2Pan = context.createStereoPanner();
     radio2Pan.connect(context.destination);
     radio2Pan.pan.value = 1.0;
-    radio1.setAudioSink(radio1Pan);
+    radio1.init(context, radio1Pan);
     radio1.setBand(band1);
-    radio2.setAudioSink(radio2Pan);
+    radio2.init(context, radio2Pan);
     radio2.setBand(band2);
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);

@@ -10,18 +10,26 @@ Frequencies are expressed as an offset from a
 base frequency. The units are hertz.
 */
 
-var Station = function(callSign, audioSink) {
+var Station = function(callSign) {
   // Station configuration
   this.callSign = callSign;
-  this.rfGainControl = context.createGain();
-  this.rfGainControl.gain.value = 0.5;
-  this.rfGainControl.connect(audioSink);
-  this.keyer = new Keyer(this.rfGainControl);
 
   // Station state (may change during contest)
   this.frequency = 0;
   this.exchange = "5nn";
   this.rfGain = 0.5;
+  this.keyer = new Keyer();
+};
+
+Station.prototype.init = function(context, audioSink) {
+  this.context = context;
+  this.audioSink = audioSink;
+
+  this.rfGainControl = context.createGain();
+  this.rfGainControl.gain.value = this.rfGain;
+  this.rfGainControl.connect(audioSink);
+  this.keyer.init(context, this.rfGainControl);
+  console.log("Keyer for " + this.callSign + " init");
 };
 
 Station.prototype.setFrequency = function(frequency) {

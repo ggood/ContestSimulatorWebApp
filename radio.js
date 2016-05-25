@@ -15,7 +15,8 @@ var Radio = function() {
   this.band = null;  // If not tuned to a band, no audio is produced
 };
 
-Radio.prototype.setAudioSink = function(audioSink) {
+Radio.prototype.init = function(context, audioSink) {
+  this.context = context;
   this.audioSink = audioSink;
   // AF Gain setup
   this.afGain = context.createGain();
@@ -74,7 +75,7 @@ Radio.prototype.setFilterFrequency = function(value) {
 
 Radio.prototype.setBand = function(value) {
   this.band = value;
-  this.band.radioConnected(this.filterBank[0]);
+  this.band.init(this.context, this.filterBank[0]);
   //this.band.radioConnected(this.audioSink);
 };
 
@@ -88,4 +89,5 @@ Radio.prototype.setFrequency = function(value) {
 
 Radio.prototype.stop = function(value) {
   this.band.radioDisconnected();
+  this.band = null;
 }

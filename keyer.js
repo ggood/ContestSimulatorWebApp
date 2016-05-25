@@ -24,12 +24,11 @@ function wpmToElementDuration(wpm) {
   return 1.0 / wpm;
 };
 
-var Keyer = function(audioSink) {
+var Keyer = function() {
   // Keyer configuration
   this.speed = 25;  // in wpm
   this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
   this.elementDuration = wpmToElementDuration(this.speed);
-  this.audioSink = audioSink;
 
   // Message sending state
   // Largest time at which we've scheduled an audio event
@@ -37,6 +36,11 @@ var Keyer = function(audioSink) {
 
   // If keyer repeat is on, this is the pending timeout
   this.currentTimeout = null;
+};
+
+Keyer.prototype.init = function(context, audioSink) {
+  this.context = context;
+  this.audioSink = audioSink;
 
   // Signal chain; oscillator -> gain (keying) -> gain (monitor volume)
   this.voiceOsc = context.createOscillator();
@@ -52,9 +56,7 @@ var Keyer = function(audioSink) {
   this.voiceOsc.connect(this.envelopeGain);
   this.envelopeGain.connect(this.monitorGain);
   this.monitorGain.connect(this.audioSink);
-
 };
-
 
 Keyer.prototype.setPitch = function(pitch) {
   // Schedule the frequency change in the future, otherwise
