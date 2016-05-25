@@ -75,10 +75,10 @@ $(function() {
     context = new (window.AudioContext || window.webkitAudioContext)
     radio1Pan = context.createStereoPanner();
     radio1Pan.connect(context.destination);
-    radio1Pan.pan.value = 1.0;
+    radio1Pan.pan.value = -11.0;
     radio2Pan = context.createStereoPanner();
     radio2Pan.connect(context.destination);
-    radio2Pan.pan.value = -1.0;
+    radio2Pan.pan.value = 1.0;
     radio1.setAudioSink(radio1Pan);
     radio1.setBand(band1);
     radio2.setAudioSink(radio2Pan);
