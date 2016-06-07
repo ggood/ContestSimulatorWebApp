@@ -29,6 +29,7 @@ var radio2 = new Radio();
 var band1 = new Band("40m");
 var band2 = new Band("80m");
 var so2rcontroller = new SO2RController();
+var keyer = new Keyer();
 
 setFrequency = function(newFrequency, radio) {
   if (!isNaN(newFrequency)) {
@@ -82,6 +83,8 @@ $(function() {
     radio2.init(context, so2rcontroller.getRadio2Input());
     radio2.setBand(band2);
 
+    keyer.init(context, so2rcontroller.getKeyerInput());
+
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
     setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
@@ -112,6 +115,16 @@ $(function() {
   $("#select-both").click(function() {
     console.log("Select both radios");
     so2rcontroller.selectBothRadios();
+  });
+
+  $("#radio1").click(function(e) {
+   console.log("focus radio1");
+   so2rcontroller.focusRadio1();
+  });
+
+  $("#radio2").click(function(e) {
+   console.log("focus radio2");
+   so2rcontroller.focusRadio2();
   });
 
   // ========= radio1 controls
@@ -258,6 +271,16 @@ $(function() {
 
   $("#f1").click(function() {
     console.log("F1");
+    radio = so2rcontroller.getFocusedRadio();
+    // BETTER WAY TO HANDLE THIS:
+    // each radio has its own keyer
+    // radio has a method send() that just delegates to the keyer
+    // that way, the so2rcontroller doesn't need to be concerned with
+    // routing audio from a single keyer. In a real station, the keying
+    // audio would be coming out of the sidetone monitor of either
+    // radio, so this is actually more like real life
+    radio.mute();
+    keyer.send("CQ TEST KM6I KM6I", function(){ console.log("DONE SENDING"); radio.unMute()});
   });
 
   $("#f2").click(function() {
@@ -274,6 +297,12 @@ $(function() {
 
   $("#f5").click(function() {
     console.log("F5");
+  });
+
+  $("#abort").click(function() {
+    console.log("ABORT");
+    keyer.abortMessage();
+    so2rcontroller.getFocusedRadio().unMute();
   });
 
 });

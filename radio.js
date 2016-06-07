@@ -50,6 +50,14 @@ Radio.prototype.setAFGain = function(value) {
   this.afGain.gain.value = value;
 };
 
+Radio.prototype.mute = function() {
+  this.afGain.disconnect();
+};
+
+Radio.prototype.unMute = function() {
+  this.afGain.connect(this.audioSink);
+};
+
 Radio.prototype.setFilterBandwidth = function(value) {
   /*
    Set the bandpass filter to a given bandwidth.

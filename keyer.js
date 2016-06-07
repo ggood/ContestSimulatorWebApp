@@ -30,6 +30,8 @@ var Keyer = function() {
   this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
   this.elementDuration = wpmToElementDuration(this.speed);
   this.startTime = 0;
+  this.completionCallback = null;
+  this.completionCallbackId = null;
 
   // Message sending state
   // Largest time at which we've scheduled an audio event
@@ -98,6 +100,11 @@ Keyer.prototype.abortMessage = function() {
   this.envelopeGain.gain.cancelScheduledValues(this.startTime);
   this.envelopeGain.gain.linearRampToValueAtTime(0.0, context.currentTime + RAMP);
   this.latestScheduledEventTime = 0.0;
+  if (this.completionCallbackId != null) {
+    clearTimeout(this.completionCallbackId);
+    setTimeout(this.completionCallback, 0);
+    this.completionCallback = null;
+  }
 
 };
 
@@ -120,8 +127,13 @@ Keyer.prototype.blab = function(text) {
 /*
  Send the given text.
  */
-Keyer.prototype.send = function(text) {
+Keyer.prototype.send = function(text, completionCallback) {
   var self = this;
+  if (typeof completionCallback === "undefined") {
+    this.completionCallback = null;
+  } else {
+    this.completionCallback = completionCallback;
+  }
 
   // Send morse
   var timeOffset = context.currentTime;
@@ -214,6 +226,11 @@ Keyer.prototype.send = function(text) {
       default:
         break;
     }
+  }
+
+  if (this.completionCallback != null) {
+    var fireTime = ((self.latestScheduledEventTime - context.currentTime) * 1000);
+    this.completionCallbackId = setTimeout(this.completionCallback, fireTime);
   }
 
   if (this.repeatInterval > 0.0) {
