@@ -120,11 +120,19 @@ $(function() {
   $("#radio1").click(function(e) {
    console.log("focus radio1");
    so2rcontroller.focusRadio1();
+   if (e.target == this) {
+     // If a child of the div was selected, don't hijack focus
+     $("#frequency").focus();
+   }
   });
 
   $("#radio2").click(function(e) {
    console.log("focus radio2");
    so2rcontroller.focusRadio2();
+   if (e.target == this) {
+     // If a child of the div was selected, don't hijack focus
+     $("#frequency2").focus();
+   }
   });
 
   // ========= radio1 controls
@@ -303,6 +311,7 @@ $(function() {
     console.log("ABORT");
     keyer.abortMessage();
     so2rcontroller.getFocusedRadio().unMute();
+    // TODO cancel timeout
   });
 
 });
