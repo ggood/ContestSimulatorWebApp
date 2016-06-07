@@ -256,4 +256,24 @@ $(function() {
     band2.setNoiseGain(newGain / 100.0  , radio2);
   });
 
+  $("#f1").click(function() {
+    console.log("F1");
+  });
+
+  $("#f2").click(function() {
+    console.log("F2");
+  });
+
+  $("#f3").click(function() {
+    console.log("F3");
+  });
+
+  $("#f4").click(function() {
+    console.log("F4");
+  });
+
+  $("#f5").click(function() {
+    console.log("F5");
+  });
+
 });

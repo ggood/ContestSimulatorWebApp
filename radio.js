@@ -88,6 +88,8 @@ Radio.prototype.setFrequency = function(value) {
 };
 
 Radio.prototype.stop = function(value) {
-  this.band.radioDisconnected();
-  this.band = null;
+  if (this.band != null) {
+    this.band.radioDisconnected();
+    this.band = null;
+  }
 }

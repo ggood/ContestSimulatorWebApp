@@ -61,8 +61,7 @@ Station.prototype.unMute = function() {
 };
 
 Station.prototype.stop = function() {
-  this.keyer.setRepeatInterval(-1.0);
-  this.keyer.abortMessage();
+  this.keyer.stop();
 };
 
 /*

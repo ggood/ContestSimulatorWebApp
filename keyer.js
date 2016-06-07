@@ -29,6 +29,7 @@ var Keyer = function() {
   this.speed = 25;  // in wpm
   this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
   this.elementDuration = wpmToElementDuration(this.speed);
+  this.startTime = 0;
 
   // Message sending state
   // Largest time at which we've scheduled an audio event
@@ -58,6 +59,15 @@ Keyer.prototype.init = function(context, audioSink) {
   this.monitorGain.connect(this.audioSink);
 };
 
+Keyer.prototype.stop = function() {
+  this.abortMessage();
+  // Just disconnecting the oscillator seems sufficient to cause
+  // CPU usage to drop when the keyer is stoppped. Previously,
+  // we did:
+  //this.voiceOsc.stop();
+  this.voiceOsc.disconnect();
+};
+
 Keyer.prototype.setPitch = function(pitch) {
   // Schedule the frequency change in the future, otherwise
   // we will hear it sweep from the current to the new
@@ -84,6 +94,7 @@ Keyer.prototype.isSending = function() {
 
 
 Keyer.prototype.abortMessage = function() {
+  this.setRepeatInterval(-1.0);
   this.envelopeGain.gain.cancelScheduledValues(this.startTime);
   this.envelopeGain.gain.linearRampToValueAtTime(0.0, context.currentTime + RAMP);
   this.latestScheduledEventTime = 0.0;
@@ -111,8 +122,6 @@ Keyer.prototype.blab = function(text) {
  */
 Keyer.prototype.send = function(text) {
   var self = this;
-
-  //console.log("Keyer: sending " + text);
 
   // Send morse
   var timeOffset = context.currentTime;
@@ -175,6 +184,7 @@ Keyer.prototype.send = function(text) {
     self.latestScheduledEventTime = timeOffset;
   }
 
+  // keyer send() implementation
   // Convert text to string representing morse dots and dashes
   var morseLetters = []
   for (var i = 0, len = text.length; i < len; i++) {
