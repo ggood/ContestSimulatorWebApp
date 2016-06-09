@@ -52,7 +52,7 @@ Band.prototype.init = function(context, audioSink) {
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].init(this.context, this.gainNode);
     this.stations[i].setFrequency(Math.random() * 10000);
-    this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 30);
+    this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 25);
     this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
     this.stations[i].callCq();
