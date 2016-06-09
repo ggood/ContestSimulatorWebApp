@@ -62,6 +62,12 @@ setNoiseGain = function(newGain, radio) {
   }
 }
 
+sendMessage = function(msg) {
+  radio = so2rcontroller.getFocusedRadio();
+  radio.mute();
+  so2rcontroller.getFocusedRadio().keyer.send(msg, function(){radio.unMute()});
+}
+
 $( document ).ready(function() {
   console.log("READY");
   // Insert other on-load app initialization here
@@ -290,27 +296,28 @@ $(function() {
   });
 
   $("#f1").click(function() {
-    console.log("F1");
-    radio = so2rcontroller.getFocusedRadio();
-    radio.mute();
     mycall = $("#mycall").val();
-    so2rcontroller.getFocusedRadio().keyer.send("CQ TEST " + mycall + " " + mycall, function(){ console.log("DONE SENDING"); radio.unMute()});
+    sendMessage("CQ TEST " + mycall + " " + mycall);
   });
 
   $("#f2").click(function() {
-    console.log("F2");
+    hiscall = $("#hiscall").val();
+    sendMessage(hiscall + " 5NN");
   });
 
   $("#f3").click(function() {
-    console.log("F3");
+    mycall = $("#mycall").val();
+    sendMessage("TU " + mycall);
   });
 
   $("#f4").click(function() {
-    console.log("F4");
+    mycall = $("#mycall").val();
+    sendMessage(mycall);
   });
 
   $("#f5").click(function() {
-    console.log("F5");
+    hiscall = $("#hiscall").val();
+    sendMessage(hiscall);
   });
 
   $("#abort").click(function() {
