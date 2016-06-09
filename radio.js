@@ -22,6 +22,10 @@ Radio.prototype.init = function(context, audioSink) {
   this.afGain = context.createGain();
   this.afGain.gain.value = 1.0;  // Unity gain
   this.afGain.connect(this.audioSink);
+  // Sidetone gain
+  this.sidetoneGain = context.createGain();
+  this.sidetoneGain.gain.value = 1.0;
+  this.sidetoneGain.connect(this.audioSink);
   // Filter setup
   this.filterBw = 500;  // Default filter bandwidth
   // Bandpass filter chain
@@ -42,6 +46,9 @@ Radio.prototype.init = function(context, audioSink) {
       this.filterBank[i].connect(this.afGain);
     }
   }
+  // Keyer setup
+  this.keyer = new Keyer();
+  this.keyer.init(this.context, this.sidetoneGain);
 
   console.log("Radio: initialized");
 };

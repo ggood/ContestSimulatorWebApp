@@ -29,7 +29,6 @@ var radio2 = new Radio();
 var band1 = new Band("40m");
 var band2 = new Band("80m");
 var so2rcontroller = new SO2RController();
-var keyer = new Keyer();
 
 setFrequency = function(newFrequency, radio) {
   if (!isNaN(newFrequency)) {
@@ -83,8 +82,6 @@ $(function() {
     radio2.init(context, so2rcontroller.getRadio2Input());
     radio2.setBand(band2);
 
-    keyer.init(context, so2rcontroller.getKeyerInput());
-
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
     setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
@@ -94,6 +91,8 @@ $(function() {
     band1.setNoiseGain(parseInt($('#noise_gain').val() / 100.0));
     band2.setListenFrequency(0);
     band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
+
+    so2rcontroller.selectBothRadios();
   });
 
   $("#stop").click(function() {
@@ -277,18 +276,25 @@ $(function() {
     band2.setNoiseGain(newGain / 100.0  , radio2);
   });
 
+  $("#keyer_speed").keyup(function(e) {
+    keyer_speed = parseInt($('#keyer_speed').val());
+    if (e.which == 38) {
+      // up arrow
+      keyer_speed += 5;
+    } else if (e.which == 40) {
+      keyer_speed = Math.max(keyer_speed - 5, 5);
+    }
+    $('#keyer_speed').val(keyer_speed.toString());
+    radio1.keyer.setSpeed(keyer_speed);
+    radio2.keyer.setSpeed(keyer_speed);
+  });
+
   $("#f1").click(function() {
     console.log("F1");
     radio = so2rcontroller.getFocusedRadio();
-    // BETTER WAY TO HANDLE THIS:
-    // each radio has its own keyer
-    // radio has a method send() that just delegates to the keyer
-    // that way, the so2rcontroller doesn't need to be concerned with
-    // routing audio from a single keyer. In a real station, the keying
-    // audio would be coming out of the sidetone monitor of either
-    // radio, so this is actually more like real life
     radio.mute();
-    keyer.send("CQ TEST KM6I KM6I", function(){ console.log("DONE SENDING"); radio.unMute()});
+    mycall = $("#mycall").val();
+    so2rcontroller.getFocusedRadio().keyer.send("CQ TEST " + mycall + " " + mycall, function(){ console.log("DONE SENDING"); radio.unMute()});
   });
 
   $("#f2").click(function() {
@@ -309,7 +315,7 @@ $(function() {
 
   $("#abort").click(function() {
     console.log("ABORT");
-    keyer.abortMessage();
+    so2rcontroller.getFocusedRadio().keyer.abortMessage();
     so2rcontroller.getFocusedRadio().unMute();
     // TODO cancel timeout
   });

@@ -74,7 +74,7 @@ Band.prototype.setListenFrequency = function(value) {
     station = this.stations[i];
     offset = station.getFrequency() - this.listenFrequency;
     if (offset > 0 && offset < 2000) {
-      console.log("Station " + station.getCallsign() + " offset " + offset);
+      //console.log("Station " + station.getCallsign() + " offset " + offset);
       station.unMute(0.0);
       station.keyer.setPitch(offset);
     } else {
