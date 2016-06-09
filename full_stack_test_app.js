@@ -140,23 +140,43 @@ $(function() {
    }
   });
 
+  // ========= tuning controls
+  $(document).keyup(function(e) {
+    if (typeof e.which == 'undefined') {
+      return;
+    }
+    if (e.which == 189) {
+      // freq down, radio 1
+      frequency = parseInt($('#frequency').val());
+      frequency = Math.max(frequency - 25, 0);
+      $('#frequency').val(frequency.toString());
+      setFrequency(frequency, radio1);
+    } else if (e.which == 187) {
+      // freq up, radio 1
+      frequency = parseInt($('#frequency').val());
+      frequency = Math.min(frequency + 25, 10000);
+      $('#frequency').val(frequency.toString());
+      setFrequency(frequency, radio1);
+    } else if (e.which == 219) {
+      // freq down, radio 2
+      frequency = parseInt($('#frequency2').val());
+      frequency = Math.max(frequency - 25, 0);
+      $('#frequency2').val(frequency.toString());
+      setFrequency(frequency, radio2);
+    } else if (e.which == 221) {
+      // freq up, radio 2
+      frequency = parseInt($('#frequency2').val());
+      frequency = Math.min(frequency + 25, 10000);
+      $('#frequency2').val(frequency.toString());
+      setFrequency(frequency, radio2);
+    }
+  });
+
   // ========= radio1 controls
 
   $("#frequency").on('input', function() {
     newFrequency = $('#frequency').val();
     setFrequency(newFrequency, radio1);
-  });
-
-  $("#frequency").keyup(function(e) {
-    frequency = parseInt($('#frequency').val());
-    if (e.which == 38) {
-      // up arrow
-      frequency = Math.min(frequency + 25, 10000);
-    } else if (e.which == 40) {
-      frequency = Math.max(frequency - 25, 0);
-    }
-    $('#frequency').val(frequency.toString());
-    setFrequency(frequency, radio1);
   });
 
   $("#gain").on('input', function() {
@@ -216,18 +236,6 @@ $(function() {
   $("#frequency2").on('input', function() {
     newFrequency = $('#frequency2').val();
     setFrequency(newFrequency, radio2);
-  });
-
-  $("#frequency2").keyup(function(e) {
-    frequency = parseInt($('#frequency2').val());
-    if (e.which == 38) {
-      // up arrow
-      frequency = Math.min(frequency + 25, 10000);
-    } else if (e.which == 40) {
-      frequency = Math.max(frequency - 25, 0);
-    }
-    $('#frequency2').val(frequency.toString());
-    setFrequency(frequency, radio2);
   });
 
   $("#gain2").on('input', function() {
@@ -321,7 +329,6 @@ $(function() {
   });
 
   $("#abort").click(function() {
-    console.log("ABORT");
     so2rcontroller.getFocusedRadio().keyer.abortMessage();
     so2rcontroller.getFocusedRadio().unMute();
     // TODO cancel timeout
