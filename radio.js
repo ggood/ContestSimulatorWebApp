@@ -105,6 +105,7 @@ Radio.prototype.setFrequency = function(value) {
 Radio.prototype.stop = function(value) {
   if (this.band != null) {
     this.band.radioDisconnected();
+    this.keyer.stop();
     this.band = null;
   }
 }
