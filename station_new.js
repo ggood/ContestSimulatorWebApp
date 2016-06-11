@@ -19,6 +19,7 @@ var Station = function(callSign) {
   this.exchange = "5nn";
   this.rfGain = 0.5;
   this.keyer = new Keyer();
+  this.mode = null;  // run or sp
 };
 
 Station.prototype.init = function(context, audioSink) {
@@ -50,6 +51,10 @@ Station.prototype.getCallsign = function() {
 
 Station.prototype.setRfGain = function(gain) {
   this.rfGain = gain;
+};
+
+Station.prototype.setMode = function(mode) {
+  this.mode = mode;
 };
 
 Station.prototype.mute = function() {
@@ -90,4 +95,19 @@ Station.prototype.sendCallSign = function() {
  */
 Station.prototype.sendTU = function() {
   this.send("tu " + this.callSign);
+};
+
+function handleMessageSearchAndPouncs(fromCall, message) {
+  console.log("Station " + this.callSign + " (" + this.mode + ") handling " + message);
+}
+
+function handleMessageRun(fromCall, message) {
+  console.log("Station " + this.callSign + " (" + this.mode + ") handling " + message);
+}
+
+Station.prototype.handleMessage = function(message) {
+  console.log("Station " + this.callSign + " (" + this.mode + ") handling " + message);
+  if (this.mode == "sp") {
+  } else if (this.mode == "run") {
+  }
 };

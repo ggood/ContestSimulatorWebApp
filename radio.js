@@ -46,6 +46,7 @@ Radio.prototype.init = function(context, audioSink) {
       this.filterBank[i].connect(this.afGain);
     }
   }
+  this.listenFrequency = 0;
   // Keyer setup
   this.keyer = new Keyer();
   this.keyer.init(this.context, this.sidetoneGain);
@@ -99,7 +100,17 @@ Radio.prototype.setFrequency = function(value) {
     console.log("Radio: not connected to a band, ignoring frequency change")
     return;
   }
+  this.listenFrequency = value;
   this.band.setListenFrequency(value);
+};
+
+Radio.prototype.sendMessage = function(message) {
+  self = this;
+  this.mute();
+  this.keyer.send(message, function() {
+    self.unMute();
+    self.band.handleMessage(message, self.listenFrequency);
+  });
 };
 
 Radio.prototype.stop = function(value) {

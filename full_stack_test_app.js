@@ -63,9 +63,7 @@ setNoiseGain = function(newGain, radio) {
 }
 
 sendMessage = function(msg) {
-  radio = so2rcontroller.getFocusedRadio();
-  radio.mute();
-  so2rcontroller.getFocusedRadio().keyer.send(msg, function(){radio.unMute()});
+  so2rcontroller.getFocusedRadio().sendMessage(msg);
 }
 
 $( document ).ready(function() {
@@ -99,6 +97,10 @@ $(function() {
     band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
 
     so2rcontroller.selectBothRadios();
+
+    keyer_speed = parseInt($('#keyer_speed').val());
+    radio1.keyer.setSpeed(keyer_speed);
+    radio2.keyer.setSpeed(keyer_speed);
   });
 
   $("#stop").click(function() {

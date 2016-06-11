@@ -86,3 +86,34 @@ Band.prototype.setListenFrequency = function(value) {
 Band.prototype.setNoiseGain = function(value) {
   this.noiseSource.setGain(value);
 }
+
+// TODO(ggood) do I need the following
+//Band.prototype.startReceivingTransmission(senderCall, frequency, message) {
+  // Indicate to the band that the local station is beginning to send
+  // the given message at a particular freqeuncy.
+//}
+
+Band.prototype.finishReceivingTransmission = function(senderCall, frequency, message) {
+  // Indicate to the band that the local station's message is now complete.
+  // FInd all stations on the band that could hear this transmission and
+  // forwaerd the message to them.
+}
+
+Band.prototype.finishReceivingCQ = function(senderCall, frequency) {
+  // Indicate to the band that our station has sent a CQ on the given
+  // frequency. The band will determine if calling station(s) respond
+  // to the CQ.
+  // TODO(ggod) for how, just always have one station respond
+  this.respondingStation = new Station("N5UM");
+  this.respondingStation.setFrequency(frequency);
+  this.respondingStation.setMode("sp");
+  this.respondingStation.handleMessage("CQ TEST " + senderCall);
+}
+
+Band.prototype.handleMessage = function(message, frequency) {
+  console.log(this.bandName + " handling message " + message + " on frequency " + frequency);
+  this.respondingStation = new Station("N5UM");
+  this.respondingStation.setFrequency(frequency);
+  this.respondingStation.setMode("sp");
+  this.respondingStation.handleMessage(message);
+}

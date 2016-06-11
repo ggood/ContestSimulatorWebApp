@@ -32,6 +32,7 @@ var Keyer = function() {
   this.startTime = 0;
   this.completionCallback = null;
   this.completionCallbackId = null;
+  this.voxDelay = 250;  // Time from message end to unkey tx
 
   // Message sending state
   // Largest time at which we've scheduled an audio event
@@ -230,7 +231,7 @@ Keyer.prototype.send = function(text, completionCallback) {
 
   if (this.completionCallback != null) {
     var fireTime = ((self.latestScheduledEventTime - context.currentTime) * 1000);
-    this.completionCallbackId = setTimeout(this.completionCallback, fireTime);
+    this.completionCallbackId = setTimeout(this.completionCallback, fireTime + this.voxDelay);
   }
 
   if (this.repeatInterval > 0.0) {
