@@ -14,13 +14,15 @@ var Station = function(callSign, mode) {
   // Station configuration
   this.callSign = callSign;
   this.mode = mode;
+  this.state = "idle";
 
   // Station state (may change during contest)
   this.frequency = 0;
   this.exchange = "5nn";
   this.rfGain = 0.5;
+
   this.keyer = new Keyer();
-  this.mode = null;  // run or sp
+  this.inactivityTimeout = null; // used for, e.g. calling cq if no answer
 };
 
 Station.prototype.init = function(context, audioSink) {
@@ -31,7 +33,10 @@ Station.prototype.init = function(context, audioSink) {
   this.rfGainControl.gain.value = this.rfGain;
   this.rfGainControl.connect(audioSink);
   this.keyer.init(context, this.rfGainControl);
-  console.log("Keyer for " + this.callSign + " init");
+
+  if (this.mode == "run") {
+    this.callCq();
+  }
 };
 
 Station.prototype.setFrequency = function(frequency) {
@@ -70,11 +75,23 @@ Station.prototype.stop = function() {
   this.keyer.stop();
 };
 
+Station.prototype.ifNothingHappens = function(fn, delay) {
+  this.pendingAction = setTimeout(fn, delay);
+  console.log("scheduled " + fn + "to happen in " + delay + "milliseconds");
+}
+
 /*
  Send a CQ
  */
 Station.prototype.callCq = function() {
-  this.keyer.send("cq test " + this.callSign + " " + this.callSign);
+  self = this;
+  callback = function() {
+    self.state = "listening_after_cq";
+    if (self.keyer.repeatInterval > 0.0) {
+      self.ifNothingHappens(self.callCq.apply(self, [self.keyer.repeatInterval * 1000]));
+    }
+  }
+  this.keyer.send("cq test " + this.callSign + " " + this.callSign, callback);
 };
 
 /*
@@ -98,17 +115,27 @@ Station.prototype.sendTU = function() {
   this.send("tu " + this.callSign);
 };
 
-function handleMessageSearchAndPouncs(fromCall, message) {
-  console.log("Station " + this.callSign + " (" + this.mode + ") handling " + message);
+function isCallsign(s) {
+  return (/^[0-9a-zA-Z\/]$/).test(s);
 }
 
-function handleMessageRun(fromCall, message) {
-  console.log("Station " + this.callSign + " (" + this.mode + ") handling " + message);
-}
+Station.prototype.handleMessageRun = function(message) {
+  console.log("handleMessageRun: " + this.callSign + " handling " + message);
+  switch (this.state) {
+    case "listening_after_cq":
+      if (isCallsign(message)) {
+        this.state = "sending_report";
+        this.keyer.send(message + " 5nn 3", function(){console.log("set state to SENT_REPORT")});
+      }
+      break;
+  }
+};
+
+
 
 Station.prototype.handleMessage = function(message) {
   console.log("Station " + this.callSign + " (" + this.mode + " on " + this.frequency + ") handling " + message);
-  if (this.mode == "sp") {
-  } else if (this.mode == "run") {
-  }
+  if (this.mode == "run") {
+    this.handleMessageRun(message)
+  } // else handle sp mode message
 };

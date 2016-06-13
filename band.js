@@ -55,6 +55,9 @@ Band.prototype.init = function(context, audioSink) {
     this.stations[i].init(this.context, this.gainNode);
     this.stations[i].setFrequency(Math.random() * 10000);
     this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 25);
+    // TODO(ggood) don't model repeats this way. Model them as the stations
+    // making the decision about when to send. That way, all of the state
+    // transitions are initiated by the station or my inbound messages.
     this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
     this.stations[i].callCq();
@@ -120,9 +123,6 @@ Band.prototype.handleMessage = function(message, frequency) {
     offset = this.stations[i].getFrequency() - frequency;
     if (Math.abs(offset) < 100) {
       this.stations[i].handleMessage(message);
-    } else {
-      console.log("Not sending to " + this.stations[i].getCallsign() + " offset " + offset);
-      console.log(this.stations[i].getCallsign() + " on " + this.stations[i].getFrequency() + " me " + frequency);
     }
   }
   //this.respondingStation = new Station("N5UM");

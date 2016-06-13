@@ -234,7 +234,7 @@ Keyer.prototype.send = function(text, completionCallback) {
     this.completionCallbackId = setTimeout(this.completionCallback, fireTime + this.voxDelay);
   }
 
-  if (this.repeatInterval > 0.0) {
+  if (this.repeatInterval > 0.0 && false) {  // XXX(ggood) added & !false to skip this code while I move cq repeat into station object
     // Arrange to send again in the future
     var delay =  ((self.latestScheduledEventTime + this.repeatInterval - context.currentTime) * 1000);
     // The following bind() call creates a new function with the "this" bound
