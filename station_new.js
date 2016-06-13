@@ -10,9 +10,10 @@ Frequencies are expressed as an offset from a
 base frequency. The units are hertz.
 */
 
-var Station = function(callSign) {
+var Station = function(callSign, mode) {
   // Station configuration
   this.callSign = callSign;
+  this.mode = mode;
 
   // Station state (may change during contest)
   this.frequency = 0;
@@ -106,7 +107,7 @@ function handleMessageRun(fromCall, message) {
 }
 
 Station.prototype.handleMessage = function(message) {
-  console.log("Station " + this.callSign + " (" + this.mode + ") handling " + message);
+  console.log("Station " + this.callSign + " (" + this.mode + " on " + this.frequency + ") handling " + message);
   if (this.mode == "sp") {
   } else if (this.mode == "run") {
   }

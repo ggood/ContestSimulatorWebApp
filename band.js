@@ -20,6 +20,7 @@
  */
 var Band = function(bandName) {
   this.bandName = bandName;
+  this.cwPitch = 610;  // TODO make this come from the radio
   // TODO remove hardcoded kber list
   this.kbers = ["N6RO", "W6YX", "W6SX", "K9YC", "K6XX", "W7RN", "N6TV",
                 "N5KO", "W6OAT", "W0YK", "KX7M", "W1RH", "W6FB", "KA3DRR",
@@ -29,8 +30,9 @@ var Band = function(bandName) {
                 "ND2T", "W6CT", "W6RGG", "WA6O"];
 
   this.stations = [];
-  for (var i = 0; i < this.kbers.length; i++) {
-    this.stations.push(new Station(this.kbers[i]));
+  //for (var i = 0; i < this.kbers.length; i++) {
+  for (var i = 0; i < 30; i++) {
+    this.stations.push(new Station(this.kbers[i], "run"));
   }
 };
 
@@ -72,13 +74,14 @@ Band.prototype.setListenFrequency = function(value) {
   console.log("Band " + this.bandName + " set to offset " + this.listenFrequency);
   for (var i = 0; i < this.stations.length; i++) {
     station = this.stations[i];
+    // Determine if we should be hearing this station, and
+    // if so, cacluate the pitch.
     offset = station.getFrequency() - this.listenFrequency;
-    if (offset > 0 && offset < 2000) {
-      //console.log("Station " + station.getCallsign() + " offset " + offset);
-      station.unMute(0.0);
-      station.keyer.setPitch(offset);
+    if ((offset < this.cwPitch * 2) && (offset > -this.cwPitch) ){
+      station.keyer.setPitch(offset + this.cwPitch);
+      station.unMute();
     } else {
-      station.mute(0.0);
+      station.mute();
     }
   }
 }
@@ -112,8 +115,18 @@ Band.prototype.finishReceivingCQ = function(senderCall, frequency) {
 
 Band.prototype.handleMessage = function(message, frequency) {
   console.log(this.bandName + " handling message " + message + " on frequency " + frequency);
-  this.respondingStation = new Station("N5UM");
-  this.respondingStation.setFrequency(frequency);
-  this.respondingStation.setMode("sp");
-  this.respondingStation.handleMessage(message);
+
+  for (var i = 0; i < this.stations.length; i++) {
+    offset = this.stations[i].getFrequency() - frequency;
+    if (Math.abs(offset) < 100) {
+      this.stations[i].handleMessage(message);
+    } else {
+      console.log("Not sending to " + this.stations[i].getCallsign() + " offset " + offset);
+      console.log(this.stations[i].getCallsign() + " on " + this.stations[i].getFrequency() + " me " + frequency);
+    }
+  }
+  //this.respondingStation = new Station("N5UM");
+  //this.respondingStation.setFrequency(frequency);
+  //this.respondingStation.setMode("sp");
+  //this.respondingStation.handleMessage(message);
 }
