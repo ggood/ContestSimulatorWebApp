@@ -116,10 +116,40 @@ Station.prototype.sendTU = function() {
 };
 
 function isCallsign(s) {
-  return (/^[0-9a-zA-Z\/]$/).test(s);
+  return (/^[0-9a-zA-Z\/]+$/).test(s);
 }
 
-Station.prototype.handleMessageRun = function(message) {
+function isCq(s) {
+  //m = s.match(/^cq *test *([0-9a-zA-Z\/]+)$/i);
+  m = s.match(/cq *test *(([0-9a-zA-Z\/]+) *)+/i);
+  console.log(m);
+  return (m != null);
+}
+
+function isMyReport(s) {
+  re = new RegExp("^ *" + this.callSign + "..*$", "i");
+  console.log(re);
+  m = re.exec(s);
+  console.log("isMyReport: " + (m != null));
+  return m != null;
+}
+
+function isTu(s) {
+  return (/^ *tu.*$/i).test(s);
+}
+
+function isFillRequest(s) {
+  //if (/^ *\? *$/i).test(s) {
+  if (/^ *tu.*$/i.test(s)) {
+    return true;
+  } else if (/^ *agn.*$/i.test(s)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+Station.prototype.handleMessageRun = function(message, fromCall) {
   console.log("handleMessageRun: " + this.callSign + " handling " + message);
   switch (this.state) {
     case "listening_after_cq":
@@ -132,10 +162,43 @@ Station.prototype.handleMessageRun = function(message) {
 };
 
 
+Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
+  console.log("handleMessageSearchAndPounce: " + this.callSign + " handling " + message);
+  console.log("THIS IS " + this);
+  switch (this.state) {
+    case "idle":
+      if (isCq(message)) {
+        keyer.send(this.callSign);
+        this.state = "wait_my_report";
+      }
+      break;
+    case "wait_my_report":
+      if (isMyReport(message)) {
+        keyer.send(fromCall + " 5NN TU");
+        this.state = "wait_confirm";
+      } else {
+        console.log("not my report");
+      }
+      break;
+    case "wait_confirm":
+      if (isTu(message)) {
+        state = "idle"
+      } else if (isFillRequest(message)) {
+        keyer.send(fromCall + " 5NN TU");
+        this.state = "wait_confirm";
+      }
+      break;
+  }
+};
 
-Station.prototype.handleMessage = function(message) {
+
+
+Station.prototype.handleMessage = function(message, fromCall) {
   console.log("Station " + this.callSign + " (" + this.mode + " on " + this.frequency + ") handling " + message);
+  console.log("In Station.handleMessage, this is " + this);
   if (this.mode == "run") {
-    this.handleMessageRun(message)
-  } // else handle sp mode message
+    this.handleMessageRun(message, fromCall);
+  } else {
+    this.handleMessageSearchAndPounce(message, fromCall);
+  }
 };

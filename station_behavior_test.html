@@ -1,0 +1,46 @@
+<html>
+
+<head>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="keyer.js"></script>
+  <script src="noise_new.js"></script>
+  <script src="band.js"></script>
+  <script src="radio.js"></script>
+  <script src="station_new.js"></script>
+  <script src="so2rcontroller.js"></script>
+  <script src="station_behavior_test.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="full_stack_test.css">
+
+</head>
+
+<body>
+  <h2>Test: Station Behavior</h2>
+  Your callsign: <input type="text" id="mycall" value="KM6I">
+  Keyer Speed: <input type="text" id="keyer_speed" value="50">
+
+  <div id="controls">
+    <button type="button" id="start" class="start-button">Start</button>
+    <button type="button" id="stop" class="stop-button">Stop</button>
+  </div>
+
+  <div id="fkeys">
+    <button type="button" id="f1" class="fkey-button">CQ</button>
+    <button type="button" id="f2" class="fkey-button">EXCH</button>
+    <button type="button" id="f3" class="fkey-button">TU</button>
+    <button type="button" id="f4" class="fkey-button">MY</button>
+    <button type="button" id="f5" class="fkey-button">HIS</button>
+    <button type="button" id="abort" class="fkey-button">ABORT</button>
+  </div>
+
+<p>
+  <div id="logging">
+    Call: <input type="text" id="hiscall">
+    Exchange: <input type="text" id="exchange">
+  </div>
+
+
+</body>
+
+</html>
