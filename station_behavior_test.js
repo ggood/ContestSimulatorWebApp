@@ -26,7 +26,8 @@ return  window.requestAnimationFrame       ||
 
 var stn1 = new Station("W8UM", "sp");
 var stn2 = new Station("KT8K", "sp");
-var keyer = new Keyer();
+console.log("Create my keyer");
+var myKeyer = new Keyer("KM6I");
 var myCall = null;
 
 setMyCall = function(myCall) {
@@ -35,7 +36,7 @@ setMyCall = function(myCall) {
 
 sendMessage = function(msg) {
   var self = this;
-  keyer.send(msg, function() {
+  myKeyer.send(msg, function() {
     self.stn1.handleMessage(msg, self.myCall);
   })
 };
@@ -56,10 +57,11 @@ $(function() {
 
     keyer_speed = parseInt($('#keyer_speed').val());
     stn1.init(context, context.destination);
-    keyer.init(context, context.destination);
-    keyer.setSpeed(keyer_speed);
-    keyer.setPitch(610);
-    stn1.keyer.setPitch(500);  // why are they both the same pitch?
+    myKeyer.init(context, context.destination);
+    myKeyer.setSpeed(keyer_speed);
+    stn1.keyer.setSpeed(20);
+    myKeyer.setPitch(500);
+    stn1.keyer.setPitch(600);  // why are they both the same pitch?
     myCall = $("#mycall").val();
   });
 
@@ -82,7 +84,7 @@ $(function() {
       keyer_speed = Math.max(keyer_speed - 5, 5);
     }
     $('#keyer_speed').val(keyer_speed.toString());
-    keyer.setSpeed(keyer_speed);
+    myKeyer.setSpeed(keyer_speed);
   });
 
   $("#f1").click(function() {
@@ -110,7 +112,7 @@ $(function() {
   });
 
   $("#abort").click(function() {
-    keyer.abortMessage();
+    myKeyer.abortMessage();
   });
 
 });

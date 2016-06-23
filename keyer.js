@@ -24,8 +24,10 @@ function wpmToElementDuration(wpm) {
   return 1.0 / wpm;
 };
 
-var Keyer = function() {
+var Keyer = function(callSign) {
   // Keyer configuration
+  console.log("init keyer with call " + callSign);
+  this.callSign = callSign;
   this.speed = 25;  // in wpm
   this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
   this.elementDuration = wpmToElementDuration(this.speed);
@@ -75,6 +77,7 @@ Keyer.prototype.setPitch = function(pitch) {
   // Schedule the frequency change in the future, otherwise
   // we will hear it sweep from the current to the new
   // frequency.
+  console.log("Keyer " + this.callSign + " set to " + pitch + " hz");
   var now = context.currentTime;
   this.voiceOsc.frequency.setValueAtTime(pitch, now);
 };
@@ -136,6 +139,7 @@ Keyer.prototype.send = function(text, completionCallback) {
     this.completionCallback = completionCallback;
   }
 
+  console.log("Keyer " + this.callSign + " sending " + text + " at freq " + this.voiceOsc.frequency.value);
   // Send morse
   var timeOffset = context.currentTime;
   this.startTime = timeOffset;

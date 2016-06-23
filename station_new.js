@@ -21,7 +21,8 @@ var Station = function(callSign, mode) {
   this.exchange = "5nn";
   this.rfGain = 0.5;
 
-  this.keyer = new Keyer();
+  this.keyer = new Keyer(this.callSign);
+  console.log("In station " + this.callSign + " creation");
   this.inactivityTimeout = null; // used for, e.g. calling cq if no answer
 };
 
@@ -33,6 +34,7 @@ Station.prototype.init = function(context, audioSink) {
   this.rfGainControl.gain.value = this.rfGain;
   this.rfGainControl.connect(audioSink);
   this.keyer.init(context, this.rfGainControl);
+  console.log("In station init, keyer callsign is " + this.keyer.callSign);
 
   if (this.mode == "run") {
     this.callCq();
@@ -115,18 +117,18 @@ Station.prototype.sendTU = function() {
   this.send("tu " + this.callSign);
 };
 
-function isCallsign(s) {
+Station.prototype.isCallsign = function(s) {
   return (/^[0-9a-zA-Z\/]+$/).test(s);
 }
 
-function isCq(s) {
+Station.prototype.isCq = function(s) {
   //m = s.match(/^cq *test *([0-9a-zA-Z\/]+)$/i);
   m = s.match(/cq *test *(([0-9a-zA-Z\/]+) *)+/i);
   console.log(m);
   return (m != null);
 }
 
-function isMyReport(s) {
+Station.prototype.isMyReport = function(s) {
   re = new RegExp("^ *" + this.callSign + "..*$", "i");
   console.log(re);
   m = re.exec(s);
@@ -134,11 +136,11 @@ function isMyReport(s) {
   return m != null;
 }
 
-function isTu(s) {
+Station.prototype.isTu = function(s) {
   return (/^ *tu.*$/i).test(s);
 }
 
-function isFillRequest(s) {
+Station.prototype.isFillRequest = function(s) {
   //if (/^ *\? *$/i).test(s) {
   if (/^ *tu.*$/i.test(s)) {
     return true;
@@ -153,7 +155,7 @@ Station.prototype.handleMessageRun = function(message, fromCall) {
   console.log("handleMessageRun: " + this.callSign + " handling " + message);
   switch (this.state) {
     case "listening_after_cq":
-      if (isCallsign(message)) {
+      if (this,isCallsign(message)) {
         this.state = "sending_report";
         this.keyer.send(message + " 5nn 3", function(){console.log("set state to SENT_REPORT")});
       }
@@ -167,24 +169,24 @@ Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
   console.log("THIS IS " + this);
   switch (this.state) {
     case "idle":
-      if (isCq(message)) {
-        keyer.send(this.callSign);
+      if (this.isCq(message)) {
+        this.keyer.send(this.callSign);
         this.state = "wait_my_report";
       }
       break;
     case "wait_my_report":
-      if (isMyReport(message)) {
-        keyer.send(fromCall + " 5NN TU");
+      if (this.isMyReport(message)) {
+        this.keyer.send(fromCall + " 5NN");
         this.state = "wait_confirm";
       } else {
         console.log("not my report");
       }
       break;
     case "wait_confirm":
-      if (isTu(message)) {
+      if (this.isTu(message)) {
         state = "idle"
       } else if (isFillRequest(message)) {
-        keyer.send(fromCall + " 5NN TU");
+        this.keyer.send(fromCall + " 5NN TU");
         this.state = "wait_confirm";
       }
       break;
