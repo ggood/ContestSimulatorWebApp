@@ -20,6 +20,7 @@ var Station = function(callSign, mode) {
   this.frequency = 0;
   this.exchange = "5nn";
   this.rfGain = 0.5;
+  this.dupes = [];
 
   this.keyer = new Keyer(this.callSign);
   console.log("In station " + this.callSign + " creation");
@@ -86,7 +87,7 @@ Station.prototype.ifNothingHappens = function(fn, delay) {
  Send a CQ
  */
 Station.prototype.callCq = function() {
-  self = this;
+  var self = this;
   callback = function() {
     self.state = "listening_after_cq";
     if (self.keyer.repeatInterval > 0.0) {
@@ -137,7 +138,7 @@ Station.prototype.isMyReport = function(s) {
 }
 
 Station.prototype.isTu = function(s) {
-  return (/^ *tu.*$/i).test(s);
+  return (/^.*tu.*$/i).test(s);
 }
 
 Station.prototype.isFillRequest = function(s) {
@@ -166,17 +167,23 @@ Station.prototype.handleMessageRun = function(message, fromCall) {
 
 Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
   console.log("handleMessageSearchAndPounce: " + this.callSign + " handling " + message);
-  console.log("THIS IS " + this);
+  console.log("THIS STATION'S CALLSIGN IS " + this.callSign);
+  var self = this;
   switch (this.state) {
     case "idle":
       if (this.isCq(message)) {
-        this.keyer.send(this.callSign);
-        this.state = "wait_my_report";
+        console.log(this.dupes);
+        if ($.inArray(fromCall, this.dupes) != -1) {
+          console.log("Station " + self.callSign + " heard CQ from " + fromCall + " but is a dupe");
+        } else {
+         setTimeout(function() {self.keyer.send(self.callSign)}, 1000);
+         this.state = "wait_my_report";
+       }
       }
       break;
     case "wait_my_report":
       if (this.isMyReport(message)) {
-        this.keyer.send(fromCall + " 5NN");
+        setTimeout(function() {self.keyer.send(fromCall + " 5NN")}, 1000);
         this.state = "wait_confirm";
       } else {
         console.log("not my report");
@@ -184,8 +191,9 @@ Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
       break;
     case "wait_confirm":
       if (this.isTu(message)) {
-        state = "idle"
-      } else if (isFillRequest(message)) {
+        this.dupes.push(fromCall);
+        this.state = "idle"
+      } else if (this.isFillRequest(message)) {
         this.keyer.send(fromCall + " 5NN TU");
         this.state = "wait_confirm";
       }

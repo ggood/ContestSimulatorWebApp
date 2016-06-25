@@ -132,6 +132,7 @@ Keyer.prototype.blab = function(text) {
  Send the given text.
  */
 Keyer.prototype.send = function(text, completionCallback) {
+  console.log("Keyer " + this.callSign + " asked to send " + text);
   var self = this;
   if (typeof completionCallback === "undefined") {
     this.completionCallback = null;
