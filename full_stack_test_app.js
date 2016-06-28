@@ -25,9 +25,9 @@ return  window.requestAnimationFrame       ||
 
 
 var radio1 = new Radio();
-var radio2 = new Radio();
+//var radio2 = new Radio();
 var band1 = new Band("40m");
-var band2 = new Band("80m");
+//var band2 = new Band("80m");
 var so2rcontroller = new SO2RController();
 
 setFrequency = function(newFrequency, radio) {
@@ -83,30 +83,30 @@ $(function() {
 
     radio1.init(context, so2rcontroller.getRadio1Input());
     radio1.setBand(band1);
-    radio2.init(context, so2rcontroller.getRadio2Input());
-    radio2.setBand(band2);
+    //radio2.init(context, so2rcontroller.getRadio2Input());
+    //radio2.setBand(band2);
 
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
-    setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
-    setFilterFrequency(parseInt($('#filter_frequency2').val()), radio2);
+    //setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
+    //setFilterFrequency(parseInt($('#filter_frequency2').val()), radio2);
 
     band1.setListenFrequency(0);
     band1.setNoiseGain(parseInt($('#noise_gain').val() / 100.0));
-    band2.setListenFrequency(0);
-    band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
+    //band2.setListenFrequency(0);
+    //band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
 
     so2rcontroller.selectBothRadios();
 
     keyer_speed = parseInt($('#keyer_speed').val());
     radio1.keyer.setSpeed(keyer_speed);
-    radio2.keyer.setSpeed(keyer_speed);
+    //radio2.keyer.setSpeed(keyer_speed);
   });
 
   $("#stop").click(function() {
     console.log("Stop simulation");
     radio1.stop();
-    radio2.stop();
+    //radio2.stop();
   });
 
   $("#select-radio1").click(function() {

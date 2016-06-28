@@ -31,7 +31,7 @@ var Band = function(bandName) {
 
   this.stations = [];
   //for (var i = 0; i < this.kbers.length; i++) {
-  for (var i = 0; i < 30; i++) {
+  for (var i = 0; i < 1; i++) {
     this.stations.push(new Station(this.kbers[i], "run"));
   }
 };
@@ -49,16 +49,16 @@ Band.prototype.init = function(context, audioSink) {
   // TODO(ggood) add QRN source
   this.listenFrequency = 5000;
 
-  const BAND_UPPER_FREQ = 10000;  // 10 KHz for now...
+  const BAND_UPPER_FREQ = 1000;  // 10 KHz for now...
 
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].init(this.context, this.gainNode);
-    this.stations[i].setFrequency(Math.random() * 10000);
+    this.stations[i].setFrequency(Math.random() * BAND_UPPER_FREQ);
     this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 25);
     // TODO(ggood) don't model repeats this way. Model them as the stations
     // making the decision about when to send. That way, all of the state
     // transitions are initiated by the station or my inbound messages.
-    this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
+    // TODO ggood repeat is station behavior this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
     this.stations[i].callCq();
   }

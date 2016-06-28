@@ -36,8 +36,10 @@ setMyCall = function(myCall) {
 
 sendMessage = function(msg) {
   var self = this;
-  myKeyer.send(msg, function() {
-    self.stn1.handleMessage(msg, self.myCall);
+  var startTime = Date.now();
+  myKeyer.send(msg, function(startTime) {
+    self.stn1.handleMessage(msg, self.myCall, startTime);
+    self.stn2.handleMessage(msg, self.myCall, startTime);
   })
 };
 
@@ -57,11 +59,14 @@ $(function() {
 
     keyer_speed = parseInt($('#keyer_speed').val());
     stn1.init(context, context.destination);
+    stn2.init(context, context.destination);
     myKeyer.init(context, context.destination);
     myKeyer.setSpeed(keyer_speed);
-    stn1.keyer.setSpeed(20);
+    stn1.keyer.setSpeed(40);
+    stn2.keyer.setSpeed(30);
     myKeyer.setPitch(500);
-    stn1.keyer.setPitch(600);  // why are they both the same pitch?
+    stn1.keyer.setPitch(600);
+    stn2.keyer.setPitch(400);
     myCall = $("#mycall").val();
   });
 
@@ -111,8 +116,24 @@ $(function() {
     sendMessage(hiscall);
   });
 
+  $("#f6").click(function() {
+    hiscall = $("#hiscall").val();
+    sendMessage(hiscall);
+  });
+
+  $("#f7").click(function() {
+    sendMessage("?");
+  });
+
   $("#abort").click(function() {
     myKeyer.abortMessage();
+  });
+
+  $("#sandp").click(function() {
+    stn1.setMode("run");
+    stn1.callCq();
+    //stn2.setMode("run");
+    //stn2.callCq();
   });
 
 });

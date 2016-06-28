@@ -24,7 +24,10 @@ var Station = function(callSign, mode) {
 
   this.keyer = new Keyer(this.callSign);
   console.log("In station " + this.callSign + " creation");
-  this.inactivityTimeout = null; // used for, e.g. calling cq if no answer
+  this.msgCompleteCallback = null;  // invoked when message send complete
+  this.inactivityCallback = null; // used for, e.g. calling cq if no answer
+
+  this.cqRepeatDelay = 2500;  // in ms
 };
 
 Station.prototype.init = function(context, audioSink) {
@@ -37,13 +40,11 @@ Station.prototype.init = function(context, audioSink) {
   this.keyer.init(context, this.rfGainControl);
   console.log("In station init, keyer callsign is " + this.keyer.callSign);
 
-  if (this.mode == "run") {
-    this.callCq();
-  }
 };
 
 Station.prototype.setFrequency = function(frequency) {
   this.frequency = frequency;
+  console.log("Station  " + this.callSign + " set to freq "  + frequency);
 };
 
 Station.prototype.getFrequency = function() {
@@ -75,6 +76,8 @@ Station.prototype.unMute = function() {
 };
 
 Station.prototype.stop = function() {
+  console.log("Clearing inactivity timeout "  + this.inactivityCallback + " for station " + this.callSign);
+  clearTimeout(this.inactivityCallback);
   this.keyer.stop();
 };
 
@@ -83,18 +86,29 @@ Station.prototype.ifNothingHappens = function(fn, delay) {
   console.log("scheduled " + fn + "to happen in " + delay + "milliseconds");
 }
 
+Station.prototype.getOpDelay = function() {
+  // Return a random delay between 0 and 1000 milliseconds
+  ret = Math.random() * 1000.0;
+  return ret;
+}
+
 /*
  Send a CQ
  */
 Station.prototype.callCq = function() {
   var self = this;
-  callback = function() {
-    self.state = "listening_after_cq";
-    if (self.keyer.repeatInterval > 0.0) {
-      self.ifNothingHappens(self.callCq.apply(self, [self.keyer.repeatInterval * 1000]));
-    }
+  console.log("callCq for " + this.callSign);
+  if (!(self.state == "idle" || self.state == "listening_after_cq" || self.state == "wait_after_tu")) {
+    return;
   }
-  this.keyer.send("cq test " + this.callSign + " " + this.callSign, callback);
+  this.msgCompleteCallback = function() {
+    self.state = "listening_after_cq";
+    // Set a timeout that fires if no one calls us - call CQ again
+    self.inactivityCallback = setTimeout(function() {self.callCq()}, self.cqRepeatDelay);
+    console.log("set inactivity callback " + self.inactivityCallback);
+  }
+  console.log("Station " + this.callSign + " sending cq");
+    this.keyer.send("cq test " + this.callSign + " " + this.callSign, this.msgCompleteCallback);
 };
 
 /*
@@ -125,15 +139,20 @@ Station.prototype.isCallsign = function(s) {
 Station.prototype.isCq = function(s) {
   //m = s.match(/^cq *test *([0-9a-zA-Z\/]+)$/i);
   m = s.match(/cq *test *(([0-9a-zA-Z\/]+) *)+/i);
-  console.log(m);
   return (m != null);
 }
 
-Station.prototype.isMyReport = function(s) {
-  re = new RegExp("^ *" + this.callSign + "..*$", "i");
-  console.log(re);
+Station.prototype.isMyReportSP = function(s) {
+  re = new RegExp("^ *" + this.callSign + "..*[1-5][1-9n][1-9n]$", "i");
   m = re.exec(s);
-  console.log("isMyReport: " + (m != null));
+  console.log("isMyReportSP: " + (m != null));
+  return m != null;
+}
+
+Station.prototype.isMyReportRun = function(s) {
+  re = new RegExp("^..*[1-5][1-9n][1-9n]$", "i");
+  m = re.exec(s);
+  console.log("isMyReportRun: " + (m != null));
   return m != null;
 }
 
@@ -143,22 +162,38 @@ Station.prototype.isTu = function(s) {
 
 Station.prototype.isFillRequest = function(s) {
   //if (/^ *\? *$/i).test(s) {
-  if (/^ *tu.*$/i.test(s)) {
+  if (/^.*agn.*$/i.test(s)) {
     return true;
-  } else if (/^ *agn.*$/i.test(s)) {
-    return true;
-  } else {
-    return false;
   }
+  if (/^\?$/.test(s)) {
+    return true;
+  }
+  return false;
 }
 
 Station.prototype.handleMessageRun = function(message, fromCall) {
-  console.log("handleMessageRun: " + this.callSign + " handling " + message);
+  var self = this;
+  console.log("handleMessageRun: " + this.callSign + " handling " + message + ", state is " + this.state);
   switch (this.state) {
     case "listening_after_cq":
-      if (this,isCallsign(message)) {
+    case "wait_after_tu":
+      if (this.isCallsign(message)) {
         this.state = "sending_report";
-        this.keyer.send(message + " 5nn 3", function(){console.log("set state to SENT_REPORT")});
+        console.log("Canceling activityTimeout " + this.inactivityCallback);
+        clearTimeout(this.inactivityCallback);
+        this.keyer.send(message + " 5nn 3", function(){
+          // need to use self here since this is a callback
+          self.state = "wait_my_report";
+        });
+      }
+      break;
+    case "wait_my_report":
+      if (this.isMyReportRun(message)) {
+        this.keyer.send("tu " + this.callSign, function() {
+          self.state = "wait_after_tu";
+          // Set a timeout that fires if no one calls us - call CQ
+          self.inactivityCallback = setTimeout(function() {self.callCq()}, self.cqRepeatDelay);
+        });
       }
       break;
   }
@@ -172,21 +207,21 @@ Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
   switch (this.state) {
     case "idle":
       if (this.isCq(message)) {
-        console.log(this.dupes);
         if ($.inArray(fromCall, this.dupes) != -1) {
           console.log("Station " + self.callSign + " heard CQ from " + fromCall + " but is a dupe");
         } else {
-         setTimeout(function() {self.keyer.send(self.callSign)}, 1000);
+         setTimeout(function() {self.keyer.send(self.callSign)}, self.getOpDelay());
          this.state = "wait_my_report";
        }
       }
       break;
     case "wait_my_report":
-      if (this.isMyReport(message)) {
-        setTimeout(function() {self.keyer.send(fromCall + " 5NN")}, 1000);
+      if (this.isMyReportSP(message)) {
+        setTimeout(function() {self.keyer.send(fromCall + " 5NN")}, self.getOpDelay());
         this.state = "wait_confirm";
       } else {
         console.log("not my report");
+        this.state = "wait_other_qso_to_end";
       }
       break;
     case "wait_confirm":
@@ -194,18 +229,26 @@ Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
         this.dupes.push(fromCall);
         this.state = "idle"
       } else if (this.isFillRequest(message)) {
-        this.keyer.send(fromCall + " 5NN TU");
+        setTimeout(function() {self.keyer.send(fromCall + " 5NN"), self.getOpDelay()});
         this.state = "wait_confirm";
       }
       break;
+    case "wait_other_qso_to_end":
+      if (this.isTu(message)) {
+        console.log(this.dupes);
+        if (!$.inArray(fromCall, this.dupes) != -1) {
+         setTimeout(function() {self.keyer.send(self.callSign)}, self.getOpDelay());
+         this.state = "wait_my_report";
+       }
+      }
   }
 };
 
 
 
 Station.prototype.handleMessage = function(message, fromCall) {
-  console.log("Station " + this.callSign + " (" + this.mode + " on " + this.frequency + ") handling " + message);
-  console.log("In Station.handleMessage, this is " + this);
+  //console.log("Station " + this.callSign + " (" + this.mode + " on " + this.frequency + ") handling " + message);
+  //console.log("In Station.handleMessage, this is " + this);
   if (this.mode == "run") {
     this.handleMessageRun(message, fromCall);
   } else {

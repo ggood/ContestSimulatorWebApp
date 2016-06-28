@@ -132,7 +132,6 @@ Keyer.prototype.blab = function(text) {
  Send the given text.
  */
 Keyer.prototype.send = function(text, completionCallback) {
-  console.log("Keyer " + this.callSign + " asked to send " + text);
   var self = this;
   if (typeof completionCallback === "undefined") {
     this.completionCallback = null;
@@ -245,6 +244,7 @@ Keyer.prototype.send = function(text, completionCallback) {
     // The following bind() call creates a new function with the "this" bound
     // to the "this" in this context. We need to do this so we have all of
     // the current context in the future invocation.
+    console.log("XXXXXX");
     this.currentTimeout = setTimeout(this.send.bind(this, text), delay);
   }
 
