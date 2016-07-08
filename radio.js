@@ -109,7 +109,7 @@ Radio.prototype.sendMessage = function(message) {
   this.mute();
   this.keyer.send(message, function() {
     self.unMute();
-    self.band.handleMessage(message, self.listenFrequency);
+    self.band.handleMessageEnd(message, self.listenFrequency);
   });
 };
 

@@ -21,9 +21,9 @@ var Station = function(callSign, mode) {
   this.exchange = "5nn";
   this.rfGain = 0.5;
   this.dupes = [];
+  this.currentDoublers = {};
 
   this.keyer = new Keyer(this.callSign);
-  console.log("In station " + this.callSign + " creation");
   this.msgCompleteCallback = null;  // invoked when message send complete
   this.inactivityCallback = null; // used for, e.g. calling cq if no answer
 
@@ -38,8 +38,6 @@ Station.prototype.init = function(context, audioSink) {
   this.rfGainControl.gain.value = this.rfGain;
   this.rfGainControl.connect(audioSink);
   this.keyer.init(context, this.rfGainControl);
-  console.log("In station init, keyer callsign is " + this.keyer.callSign);
-
 };
 
 Station.prototype.setFrequency = function(frequency) {
@@ -107,8 +105,8 @@ Station.prototype.callCq = function() {
     self.inactivityCallback = setTimeout(function() {self.callCq()}, self.cqRepeatDelay);
     console.log("set inactivity callback " + self.inactivityCallback);
   }
-  console.log("Station " + this.callSign + " sending cq");
-    this.keyer.send("cq test " + this.callSign + " " + this.callSign, this.msgCompleteCallback);
+  self.state = "calling_cq";
+  this.keyer.send("cq test " + this.callSign + " " + this.callSign, this.msgCompleteCallback);
 };
 
 /*
@@ -171,12 +169,41 @@ Station.prototype.isFillRequest = function(s) {
   return false;
 }
 
-Station.prototype.handleMessageRun = function(message, fromCall) {
-  var self = this;
-  console.log("handleMessageRun: " + this.callSign + " handling " + message + ", state is " + this.state);
+Station.prototype.handleMessageBeginRun = function(message, fromCall) {
+  console.log("handleMessageBeginRun: " + this.callSign + " handling " + message);
   switch (this.state) {
+    case "calling_cq":
+      console.log("Station " + fromCall + " doubled with CQing " + this.callSign);
+      this.currentDoublers[fromCall] = true;
+      break;
     case "listening_after_cq":
     case "wait_after_tu":
+      // Clear the inactivity timeout so we don't CQ on top of the caller
+      clearTimeout(this.inactivityCallback);
+  }
+};
+
+Station.prototype.handleMessageBeginSearchAndPounce = function(message, fromCall) {
+  console.log("handleMessageBeginSearchAndPounce: " + this.callSign + " handling " + message);
+};
+
+Station.prototype.handleMessageEndRun = function(message, fromCall) {
+  var self = this;
+  console.log("handleMessageEndRun: " + this.callSign + " handling " + message + ", state is " + this.state);
+  switch (this.state) {
+    case "calling_cq":
+      // The other station's double started and ended while we were still
+      // sending. Remove that station from the doublers list since we would
+      // have never heard them. Ignoring QSK for now.
+      delete this.currentDoublers[fromCall];
+      break;
+    case "listening_after_cq":
+    case "wait_after_tu":
+      if (!jQuery.isEmptyObject(this.currentDoublers)) {
+        this.currentDoublers = {};
+        this.keyer.send("?");
+        break;
+      }
       if (this.isCallsign(message)) {
         this.state = "sending_report";
         console.log("Canceling activityTimeout " + this.inactivityCallback);
@@ -196,13 +223,18 @@ Station.prototype.handleMessageRun = function(message, fromCall) {
         });
       }
       break;
+    case "double":
+      this.keyer.send("?", function() {
+        self.state = "listening_after_cq";
+        self.inactivityCallback = setTimeout(function() {self.callCq()}, self.cqRepeatDelay);
+      });
+      break;
   }
 };
 
 
-Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
-  console.log("handleMessageSearchAndPounce: " + this.callSign + " handling " + message);
-  console.log("THIS STATION'S CALLSIGN IS " + this.callSign);
+Station.prototype.handleMessageEndSearchAndPounce = function(message, fromCall) {
+  console.log("handleMessageEndSearchAndPounce: " + this.callSign + " handling " + message);
   var self = this;
   switch (this.state) {
     case "idle":
@@ -244,14 +276,26 @@ Station.prototype.handleMessageSearchAndPounce = function(message, fromCall) {
   }
 };
 
-
-
-Station.prototype.handleMessage = function(message, fromCall) {
-  //console.log("Station " + this.callSign + " (" + this.mode + " on " + this.frequency + ") handling " + message);
-  //console.log("In Station.handleMessage, this is " + this);
+Station.prototype.handleMessageBegin = function(message, fromCall) {
   if (this.mode == "run") {
-    this.handleMessageRun(message, fromCall);
+    this.handleMessageBeginRun(message, fromCall);
   } else {
-    this.handleMessageSearchAndPounce(message, fromCall);
+    this.handleMessageBeginSearchAndPounce(message, fromCall);
+  }
+};
+
+
+Station.prototype.handleMessageEnd = function(message, fromCall) {
+  if (this.keyer.isSending()) {
+    console.log("NOT handling message end from " + fromCall + " because station " + this.callSign + " keyer is sending");
+    // What to do here? If the message is a "total double" we want to ignore it
+    // But if it was a partial double (meaning: the sender started while we
+    // were transmitting but we stopped transmitting before they were finished)
+    // we want to send a "?"
+  }
+  if (this.mode == "run") {
+    this.handleMessageEndRun(message, fromCall);
+  } else {
+    this.handleMessageEndSearchAndPounce(message, fromCall);
   }
 };

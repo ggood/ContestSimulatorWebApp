@@ -26,7 +26,6 @@ function wpmToElementDuration(wpm) {
 
 var Keyer = function(callSign) {
   // Keyer configuration
-  console.log("init keyer with call " + callSign);
   this.callSign = callSign;
   this.speed = 25;  // in wpm
   this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
@@ -53,6 +52,7 @@ Keyer.prototype.init = function(context, audioSink) {
   this.voiceOsc.type = 'sine';
   this.voiceOsc.frequency.value = 500;
   this.voiceOsc.start();
+
   // envelopeGain control is used to generate keying envelope
   this.envelopeGain = context.createGain();
   this.envelopeGain.gain.value = 0.0;
@@ -68,8 +68,7 @@ Keyer.prototype.stop = function() {
   this.abortMessage();
   // Just disconnecting the oscillator seems sufficient to cause
   // CPU usage to drop when the keyer is stoppped. Previously,
-  // we did:
-  //this.voiceOsc.stop();
+  // we did this.voiceOsc.stop();
   this.voiceOsc.disconnect();
 };
 
@@ -77,7 +76,6 @@ Keyer.prototype.setPitch = function(pitch) {
   // Schedule the frequency change in the future, otherwise
   // we will hear it sweep from the current to the new
   // frequency.
-  console.log("Keyer " + this.callSign + " set to " + pitch + " hz");
   var now = context.currentTime;
   this.voiceOsc.frequency.setValueAtTime(pitch, now);
 };
@@ -244,7 +242,6 @@ Keyer.prototype.send = function(text, completionCallback) {
     // The following bind() call creates a new function with the "this" bound
     // to the "this" in this context. We need to do this so we have all of
     // the current context in the future invocation.
-    console.log("XXXXXX");
     this.currentTimeout = setTimeout(this.send.bind(this, text), delay);
   }
 

@@ -37,9 +37,11 @@ setMyCall = function(myCall) {
 sendMessage = function(msg) {
   var self = this;
   var startTime = Date.now();
+  self.stn1.handleMessageBegin(msg, self.myCall);
+  self.stn2.handleMessageBegin(msg, self.myCall);
   myKeyer.send(msg, function(startTime) {
-    self.stn1.handleMessage(msg, self.myCall, startTime);
-    self.stn2.handleMessage(msg, self.myCall, startTime);
+    self.stn1.handleMessageEnd(msg, self.myCall, startTime);
+    self.stn2.handleMessageEnd(msg, self.myCall, startTime);
   })
 };
 
@@ -73,6 +75,7 @@ $(function() {
   $("#stop").click(function() {
     console.log("Stop simulation");
     stn1.stop();
+    stn2.stop();
   });
 
   $("#mycall").keyup(function(e) {
@@ -132,7 +135,7 @@ $(function() {
   $("#sandp").click(function() {
     stn1.setMode("run");
     stn1.callCq();
-    //stn2.setMode("run");
+    stn2.setMode("run");
     //stn2.callCq();
   });
 

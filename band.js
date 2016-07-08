@@ -113,20 +113,20 @@ Band.prototype.finishReceivingCQ = function(senderCall, frequency) {
   this.respondingStation = new Station("N5UM");
   this.respondingStation.setFrequency(frequency);
   this.respondingStation.setMode("sp");
-  this.respondingStation.handleMessage("CQ TEST " + senderCall);
+  this.respondingStation.handleMessageEnd("CQ TEST " + senderCall);
 }
 
-Band.prototype.handleMessage = function(message, frequency) {
-  console.log(this.bandName + " handling message " + message + " on frequency " + frequency);
+Band.prototype.handleMessageEnd = function(message, frequency) {
+  console.log(this.bandName + " handling message end " + message + " on frequency " + frequency);
 
   for (var i = 0; i < this.stations.length; i++) {
     offset = this.stations[i].getFrequency() - frequency;
     if (Math.abs(offset) < 100) {
-      this.stations[i].handleMessage(message);
+      this.stations[i].handleMessageEnd(message);
     }
   }
   //this.respondingStation = new Station("N5UM");
   //this.respondingStation.setFrequency(frequency);
   //this.respondingStation.setMode("sp");
-  //this.respondingStation.handleMessage(message);
+  //this.respondingStation.handleMessageEnd(message);
 }
