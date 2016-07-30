@@ -38,10 +38,10 @@ sendMessage = function(msg) {
   var self = this;
   var startTime = Date.now();
   self.stn1.handleMessageBegin(msg, self.myCall);
-  self.stn2.handleMessageBegin(msg, self.myCall);
+  //self.stn2.handleMessageBegin(msg, self.myCall);
   myKeyer.send(msg, function(startTime) {
     self.stn1.handleMessageEnd(msg, self.myCall, startTime);
-    self.stn2.handleMessageEnd(msg, self.myCall, startTime);
+    //self.stn2.handleMessageEnd(msg, self.myCall, startTime);
   })
 };
 
@@ -61,21 +61,21 @@ $(function() {
 
     keyer_speed = parseInt($('#keyer_speed').val());
     stn1.init(context, context.destination);
-    stn2.init(context, context.destination);
+    //stn2.init(context, context.destination);
     myKeyer.init(context, context.destination);
     myKeyer.setSpeed(keyer_speed);
     stn1.keyer.setSpeed(40);
-    stn2.keyer.setSpeed(30);
+    //stn2.keyer.setSpeed(30);
     myKeyer.setPitch(500);
     stn1.keyer.setPitch(600);
-    stn2.keyer.setPitch(400);
+    //stn2.keyer.setPitch(400);
     myCall = $("#mycall").val();
   });
 
   $("#stop").click(function() {
     console.log("Stop simulation");
     stn1.stop();
-    stn2.stop();
+    //stn2.stop();
   });
 
   $("#mycall").keyup(function(e) {
@@ -135,7 +135,7 @@ $(function() {
   $("#sandp").click(function() {
     stn1.setMode("run");
     stn1.callCq();
-    stn2.setMode("run");
+    //stn2.setMode("run");
     //stn2.callCq();
   });
 

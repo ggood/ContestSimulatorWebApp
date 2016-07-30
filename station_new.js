@@ -170,12 +170,16 @@ Station.prototype.isFillRequest = function(s) {
 }
 
 Station.prototype.handleMessageBeginRun = function(message, fromCall) {
-  console.log("handleMessageBeginRun: " + this.callSign + " handling " + message);
+  console.log("handleMessageBeginRun: " + this.callSign + " handling " + message + " while in state " + this.state);
+  if (this.keyer.isSending()) {
+    console.log("Station " + fromCall + " doubled with sending station " + this.callSign);
+    this.currentDoublers[fromCall] = true;
+    return;
+  } else {
+    console.log("Station " + this.callSign + " keyer is NOT sending");
+  }
   switch (this.state) {
     case "calling_cq":
-      console.log("Station " + fromCall + " doubled with CQing " + this.callSign);
-      this.currentDoublers[fromCall] = true;
-      break;
     case "listening_after_cq":
     case "wait_after_tu":
       // Clear the inactivity timeout so we don't CQ on top of the caller
@@ -190,20 +194,20 @@ Station.prototype.handleMessageBeginSearchAndPounce = function(message, fromCall
 Station.prototype.handleMessageEndRun = function(message, fromCall) {
   var self = this;
   console.log("handleMessageEndRun: " + this.callSign + " handling " + message + ", state is " + this.state);
+  if (this.keyer.isSending()) {
+    // The other station's double started and ended while we were still
+    // sending. Remove that station from the doublers list since we would
+    // have never heard them. Ignoring QSK for now.
+    delete this.currentDoublers[fromCall];
+    return;
+  } else if (!jQuery.isEmptyObject(this.currentDoublers)) {
+    this.currentDoublers = {};
+    this.keyer.send("?");
+    return;
+  }
   switch (this.state) {
-    case "calling_cq":
-      // The other station's double started and ended while we were still
-      // sending. Remove that station from the doublers list since we would
-      // have never heard them. Ignoring QSK for now.
-      delete this.currentDoublers[fromCall];
-      break;
     case "listening_after_cq":
     case "wait_after_tu":
-      if (!jQuery.isEmptyObject(this.currentDoublers)) {
-        this.currentDoublers = {};
-        this.keyer.send("?");
-        break;
-      }
       if (this.isCallsign(message)) {
         this.state = "sending_report";
         console.log("Canceling activityTimeout " + this.inactivityCallback);
