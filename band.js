@@ -31,7 +31,7 @@ var Band = function(bandName) {
 
   this.stations = [];
   //for (var i = 0; i < this.kbers.length; i++) {
-  for (var i = 0; i < 1; i++) {
+  for (var i = 0; i < this.kbers.length; i++) {
     this.stations.push(new Station(this.kbers[i], "run"));
   }
 };
@@ -49,7 +49,7 @@ Band.prototype.init = function(context, audioSink) {
   // TODO(ggood) add QRN source
   this.listenFrequency = 5000;
 
-  const BAND_UPPER_FREQ = 1000;  // 10 KHz for now...
+  const BAND_UPPER_FREQ = 30000;  // 10 KHz for now...
 
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].init(this.context, this.gainNode);
