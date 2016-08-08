@@ -18,7 +18,7 @@ var Station = function(callSign, mode) {
 
   // Station state (may change during contest)
   this.frequency = 0;
-  this.exchange = "5nn";
+  this.exchange = "5nn 3";
   this.rfGain = 0.5;
   this.dupes = [];
   this.currentDoublers = {};
@@ -87,6 +87,7 @@ Station.prototype.ifNothingHappens = function(fn, delay) {
 Station.prototype.getOpDelay = function() {
   // Return a random delay between 0 and 1000 milliseconds
   ret = Math.random() * 1000.0;
+  console.log("opDelay is " + ret);
   return ret;
 }
 
@@ -95,7 +96,7 @@ Station.prototype.getOpDelay = function() {
  */
 Station.prototype.callCq = function() {
   var self = this;
-  console.log("callCq for " + this.callSign);
+  //console.log("callCq for " + this.callSign);
   if (!(self.state == "idle" || self.state == "listening_after_cq" || self.state == "wait_after_tu")) {
     return;
   }
@@ -103,7 +104,7 @@ Station.prototype.callCq = function() {
     self.state = "listening_after_cq";
     // Set a timeout that fires if no one calls us - call CQ again
     self.inactivityCallback = setTimeout(function() {self.callCq()}, self.cqRepeatDelay);
-    console.log("set inactivity callback " + self.inactivityCallback);
+    //console.log("set inactivity callback " + self.inactivityCallback);
   }
   self.state = "calling_cq";
   this.keyer.send("cq test " + this.callSign + " " + this.callSign, this.msgCompleteCallback);
@@ -169,6 +170,13 @@ Station.prototype.isFillRequest = function(s) {
   return false;
 }
 
+Station.prototype.respond = function(msg) {
+  // Send a response to a message, with a short random delay.
+  var self = this;
+  console.log("RESPOND");
+  setTimeout(function() {self.keyer.send(msg)}, self.getOpDelay());
+}
+
 Station.prototype.handleMessageBeginRun = function(message, fromCall) {
   console.log("handleMessageBeginRun: " + this.callSign + " handling " + message + " while in state " + this.state);
   if (this.keyer.isSending()) {
@@ -199,8 +207,12 @@ Station.prototype.handleMessageEndRun = function(message, fromCall) {
     // sending. Remove that station from the doublers list since we would
     // have never heard them. Ignoring QSK for now.
     delete this.currentDoublers[fromCall];
+    console.log("total double from " + fromCall);
     return;
   } else if (!jQuery.isEmptyObject(this.currentDoublers)) {
+    // The other station's double started while we were transmitting, but
+    // ended after we started listening. Send a "?".
+    console.log("Partial double from " + fromCall);
     this.currentDoublers = {};
     this.keyer.send("?");
     return;
@@ -212,10 +224,9 @@ Station.prototype.handleMessageEndRun = function(message, fromCall) {
         this.state = "sending_report";
         console.log("Canceling activityTimeout " + this.inactivityCallback);
         clearTimeout(this.inactivityCallback);
-        this.keyer.send(message + " 5nn 3", function(){
-          // need to use self here since this is a callback
-          self.state = "wait_my_report";
-        });
+        self.respond(message +  "5nn 3");
+        //setTimeout(function() {self.keyer.send(message + " 5nn 3")}, self.getOpDelay());
+        self.state = "wait_my_report";
       }
       break;
     case "wait_my_report":

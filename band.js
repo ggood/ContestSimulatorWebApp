@@ -74,7 +74,6 @@ Band.prototype.radioDisconnected = function() {
 
 Band.prototype.setListenFrequency = function(value) {
   this.listenFrequency = value;
-  console.log("Band " + this.bandName + " set to offset " + this.listenFrequency);
   for (var i = 0; i < this.stations.length; i++) {
     station = this.stations[i];
     // Determine if we should be hearing this station, and
@@ -125,8 +124,4 @@ Band.prototype.handleMessageEnd = function(message, frequency) {
       this.stations[i].handleMessageEnd(message);
     }
   }
-  //this.respondingStation = new Station("N5UM");
-  //this.respondingStation.setFrequency(frequency);
-  //this.respondingStation.setMode("sp");
-  //this.respondingStation.handleMessageEnd(message);
 }

@@ -137,7 +137,7 @@ Keyer.prototype.send = function(text, completionCallback) {
     this.completionCallback = completionCallback;
   }
 
-  console.log("Keyer " + this.callSign + " sending " + text + " at freq " + this.voiceOsc.frequency.value);
+  //console.log("Keyer " + this.callSign + " sending " + text + " at freq " + this.voiceOsc.frequency.value);
   // Send morse
   var timeOffset = context.currentTime;
   this.startTime = timeOffset;
