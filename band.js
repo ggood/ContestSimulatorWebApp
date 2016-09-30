@@ -21,22 +21,22 @@
 var Band = function(bandName) {
   this.bandName = bandName;
   this.cwPitch = 610;  // TODO make this come from the radio
+  this.numRunners = 50;  // TODO make this configurable
   // TODO remove hardcoded kber list
-  this.kbers = ["N6RO", "W6YX", "W6SX", "K9YC", "K6XX", "W7RN", "N6TV",
-                "N5KO", "W6OAT", "W0YK", "KX7M", "W1RH", "W6FB", "KA3DRR",
-                "K6MM", "AE6Y", "WC6H", "K5RC", "W6JTI", "KM6I", "KE1B",
-                "K6MMM", "K6RIM", "W6NL", "NA6O", "K6MR", "K6VVA", "N6BV",
-                "K3EST", "N6EE", "N6IE", "K6MI", "N6ML", "N6NZ", "N6WM",
-                "ND2T", "W6CT", "W6RGG", "WA6O"];
-
+  this.runners = [];
   this.stations = [];
-  //for (var i = 0; i < this.kbers.length; i++) {
-  for (var i = 0; i < this.kbers.length; i++) {
-    this.stations.push(new Station(this.kbers[i], "run"));
-  }
 };
 
 Band.prototype.init = function(context, audioSink) {
+  for (var i = 0; i < this.numRunners; i++) {
+    var callsign = document.callsigns[Math.floor(Math.random() * document.callsigns.length)];
+    this.runners.push(callsign);
+  }
+
+  for (var i = 0; i < this.runners.length; i++) {
+    this.stations.push(new Station(this.runners[i], "run"));
+  }
+
   this.context = context;
   this.audioSink = audioSink;
 
@@ -101,7 +101,7 @@ Band.prototype.setNoiseGain = function(value) {
 Band.prototype.finishReceivingTransmission = function(senderCall, frequency, message) {
   // Indicate to the band that the local station's message is now complete.
   // FInd all stations on the band that could hear this transmission and
-  // forwaerd the message to them.
+  // forward the message to them.
 }
 
 Band.prototype.finishReceivingCQ = function(senderCall, frequency) {

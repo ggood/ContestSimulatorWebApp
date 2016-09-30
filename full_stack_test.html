@@ -2,7 +2,8 @@
 
 <head>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> -->
+  <script src="jquery.min.js"></script>
   <script src="keyer.js"></script>
   <script src="noise_new.js"></script>
   <script src="band.js"></script>
@@ -13,9 +14,22 @@
 
   <link rel="stylesheet" type="text/css" href="full_stack_test.css">
 
+  <script type="text/javascript">
+    function LoadFile() {
+      var oFrame = document.getElementById("callsigns");
+      var strRawContents = oFrame.contentWindow.document.body.childNodes[0].innerHTML;
+      while (strRawContents.indexOf("\r") >= 0)
+          strRawContents = strRawContents.replace("\r", "");
+      // Intentionally global
+      document.callsigns = strRawContents.split("\n");
+      console.log("File " + oFrame.src + " has " + document.callsigns.length + " lines");
+    }
+</script>
+
 </head>
 
 <body>
+  <iframe id="callsigns" src="master.scp.txt" onload="LoadFile();" style="display: none;"></iframe>
   <h2>Test: Full App Stack</h2>
   Tune Radio 1: "-" and "="
   <br>
@@ -26,29 +40,29 @@
   <div id="radios">
     <div id="radio1">
       Radio 1<br>
-      Tuner Frequency (hz): <input type="text" id="frequency" value="0"> (arrow up/down to change)
+      Tuner Frequency (hz): <input type="text" id="frequency" value="0" class="ignnav"> (arrow up/down to change)
       <br>
-      AF Gain (0-100): <input type="text" id="gain" value="100">
+      AF Gain (0-100): <input type="text" id="gain" value="100" class="ignnav">
       <br>
-      RX Bandwidth (100-2000): <input type="text" id="bandwidth" value="400"> (arrow up/down to change)
+      RX Bandwidth (100-2000): <input type="text" id="bandwidth" value="400" class="ignnav"> (arrow up/down to change)
       <br>
-      RX Filter Frequency (100-1800): <input type="text" id="filter_frequency" value="700"> (arrow up/down to change)
+      RX Filter Frequency (100-1800): <input type="text" id="filter_frequency" value="700" class="ignnav"> (arrow up/down to change)
       <br>
-      Noise Gain (0-100): <input type="text" id="noise_gain" value="40">
+      Noise Gain (0-100): <input type="text" id="noise_gain" value="40" class="ignnav">
       <p>
     </div>
 
     <div id="radio2">
       Radio 2<br>
-      Tuner Frequency (hz): <input type="text" id="frequency2" value="0"> (arrow up/down to change)
+      Tuner Frequency (hz): <input type="text" id="frequency2" value="0" class="ignnav"> (arrow up/down to change)
       <br>
-      AF Gain (0-100): <input type="text" id="gain2" value="100">
+      AF Gain (0-100): <input type="text" id="gain2" value="100" class="ignnav">
       <br>
-      RX Bandwidth (100-2000): <input type="text" id="bandwidth2" value="400"> (arrow up/down to change)
+      RX Bandwidth (100-2000): <input type="text" id="bandwidth2" value="400" class="ignnav"> (arrow up/down to change)
       <br>
-      RX Filter Frequency (100-1800): <input type="text" id="filter_frequency2" value="700"> (arrow up/down to change)
+      RX Filter Frequency (100-1800): <input type="text" id="filter_frequency2" value="700" class="ignnav"> (arrow up/down to change)
       <br>
-      Noise Gain (0-100): <input type="text" id="noise_gain2" value="40">
+      Noise Gain (0-100): <input type="text" id="noise_gain2" value="40" class="ignnav">
       <p>
     </div>
   </div>
@@ -72,8 +86,8 @@
 
 <p>
   <div id="logging">
-    Call: <input type="text" id="hiscall">
-    Exchange: <input type="text" id="exchange">
+    Call: <input type="text" id="hiscall" class="ignnav">
+    Exchange: <input type="text" id="exchange" class="ignnav">
   </div>
 
 

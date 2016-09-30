@@ -101,6 +101,17 @@ $(function() {
     keyer_speed = parseInt($('#keyer_speed').val());
     radio1.keyer.setSpeed(keyer_speed);
     radio2.keyer.setSpeed(keyer_speed);
+
+    // Disable frequency navigation keys in text fields
+    $( ".ignnav" ).each(function( index ) {
+      this.onkeydown = function() {
+        var key = event.keyCode || event.charCode;
+        if (key == 219 || key == 221 || key == 189 || key == 187) {
+          return false;
+        }
+      }
+      console.log( index + ": " + $( this ).text() );
+    });
   });
 
   $("#stop").click(function() {
