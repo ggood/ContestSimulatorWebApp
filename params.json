@@ -1,6 +1,6 @@
 {
   "name": "Contest Sim",
   "tagline": "A contest simulator that runs right in your browser",
-  "body": "Support for generating audio directly in the browser has come a long way, and it's now possible to build a full contest simulator that runs in any modern browser. This page allows you to try some prototypes I'm working on, as well as look at the code.\r\n\r\nHere's a rough prototype: [Prototype](full_stack_test.html)\r\n\r\n",
+  "body": "Support for generating audio directly in the browser has come a long way, and it's now possible to build a full contest simulator that runs in any modern browser. This page allows you to try some prototypes I'm working on, as well as look at the code.\r\n\r\n[Here's a rough prototype](full_stack_test.html)\r\n\r\nWhen you click the Start button, you will have 2 simulated radios, one in each ear, that you can tune by clicking in one of the two Tuner Frequency boxes and using the up/down arrow keys.\r\n\r\nThis prototype adds some autonomous stations to the simulation. If you tune to their frequency and presss\r\n\r\n[SO2R Simulator Prototype](station_test.html)\r\n\r\n",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
