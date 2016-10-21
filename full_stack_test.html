@@ -31,16 +31,13 @@
 <body>
   <iframe id="callsigns" src="master.scp.txt" onload="LoadFile();" style="display: none;"></iframe>
   <h2>Test: Full App Stack</h2>
-  Tune Radio 1: "-" and "="
-  <br>
-  Tune Radio 2: "[" and "]"
   <p>
   Your callsign: <input type="text" id="mycall" value="W8UM">
   Keyer Speed: <input type="text" id="keyer_speed" value="50">
   <div id="radios">
     <div id="radio1">
       Radio 1<br>
-      Tuner Frequency (hz): <input type="text" id="frequency" value="0" class="ignnav"> (arrow up/down to change)
+      Tuner Frequency (hz): <input type="text" id="frequency" value="0" class="ignnav"> ("-" and "=" to tune)
       <br>
       AF Gain (0-100): <input type="text" id="gain" value="100" class="ignnav">
       <br>
@@ -54,7 +51,7 @@
 
     <div id="radio2">
       Radio 2<br>
-      Tuner Frequency (hz): <input type="text" id="frequency2" value="0" class="ignnav"> (arrow up/down to change)
+      Tuner Frequency (hz): <input type="text" id="frequency2" value="0" class="ignnav"> ("[" and "]" to tune)
       <br>
       AF Gain (0-100): <input type="text" id="gain2" value="100" class="ignnav">
       <br>
