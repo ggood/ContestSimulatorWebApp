@@ -28,6 +28,7 @@ var radio1 = new Radio();
 var radio2 = new Radio();
 var band1 = new Band("40m");
 var band2 = new Band("80m");
+var so2rcontroller = new SO2RController();
 
 setFrequency = function(newFrequency, radio) {
   if (!isNaN(newFrequency)) {
@@ -61,6 +62,10 @@ setNoiseGain = function(newGain, radio) {
   }
 }
 
+sendMessage = function(msg) {
+  so2rcontroller.getFocusedRadio().sendMessage(msg);
+}
+
 $( document ).ready(function() {
   console.log("READY");
   // Insert other on-load app initialization here
@@ -72,25 +77,41 @@ $(function() {
 
   $("#start").click(function() {
     console.log("Start simulation");
-    context = new (window.AudioContext || window.webkitAudioContext)
-    radio1Pan = context.createStereoPanner();
-    radio1Pan.connect(context.destination);
-    radio1Pan.pan.value = -11.0;
-    radio2Pan = context.createStereoPanner();
-    radio2Pan.connect(context.destination);
-    radio2Pan.pan.value = 1.0;
-    radio1.init(context, radio1Pan);
+    context = new (window.AudioContext || window.webkitAudioContext);
+
+    so2rcontroller.init(context, context.destination);
+
+    radio1.init(context, so2rcontroller.getRadio1Input());
     radio1.setBand(band1);
-    radio2.init(context, radio2Pan);
+    radio2.init(context, so2rcontroller.getRadio2Input());
     radio2.setBand(band2);
+
     setFilterBandwidth(parseInt($('#bandwidth').val()), radio1);
     setFilterFrequency(parseInt($('#filter_frequency').val()), radio1);
     setFilterBandwidth(parseInt($('#bandwidth2').val()), radio2);
     setFilterFrequency(parseInt($('#filter_frequency2').val()), radio2);
+
     band1.setListenFrequency(0);
     band1.setNoiseGain(parseInt($('#noise_gain').val() / 100.0));
     band2.setListenFrequency(0);
     band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
+
+    so2rcontroller.selectBothRadios();
+
+    keyer_speed = parseInt($('#keyer_speed').val());
+    radio1.keyer.setSpeed(keyer_speed);
+    radio2.keyer.setSpeed(keyer_speed);
+
+    // Disable frequency navigation keys in text fields
+    $( ".ignnav" ).each(function( index ) {
+      this.onkeydown = function() {
+        var key = event.keyCode || event.charCode;
+        if (key == 219 || key == 221 || key == 189 || key == 187) {
+          return false;
+        }
+      }
+      console.log( index + ": " + $( this ).text() );
+    });
   });
 
   $("#stop").click(function() {
@@ -99,23 +120,76 @@ $(function() {
     radio2.stop();
   });
 
+  $("#select-radio1").click(function() {
+    console.log("Select radio 1");
+    so2rcontroller.selectRadio1();
+  });
+
+  $("#select-radio2").click(function() {
+    console.log("Select radio 2");
+    so2rcontroller.selectRadio2();
+  });
+
+  $("#select-both").click(function() {
+    console.log("Select both radios");
+    so2rcontroller.selectBothRadios();
+  });
+
+  $("#radio1").click(function(e) {
+   console.log("focus radio1");
+   so2rcontroller.focusRadio1();
+   if (e.target == this) {
+     // If a child of the div was selected, don't hijack focus
+     $("#frequency").focus();
+   }
+  });
+
+  $("#radio2").click(function(e) {
+   console.log("focus radio2");
+   so2rcontroller.focusRadio2();
+   if (e.target == this) {
+     // If a child of the div was selected, don't hijack focus
+     $("#frequency2").focus();
+   }
+  });
+
+  // ========= tuning controls
+  $(document).keyup(function(e) {
+    if (typeof e.which == 'undefined') {
+      return;
+    }
+    if (e.which == 189) {
+      // freq down, radio 1
+      frequency = parseInt($('#frequency').val());
+      frequency = Math.max(frequency - 25, 0);
+      $('#frequency').val(frequency.toString());
+      setFrequency(frequency, radio1);
+    } else if (e.which == 187) {
+      // freq up, radio 1
+      frequency = parseInt($('#frequency').val());
+      frequency = Math.min(frequency + 25, 10000);
+      $('#frequency').val(frequency.toString());
+      setFrequency(frequency, radio1);
+    } else if (e.which == 219) {
+      // freq down, radio 2
+      frequency = parseInt($('#frequency2').val());
+      frequency = Math.max(frequency - 25, 0);
+      $('#frequency2').val(frequency.toString());
+      setFrequency(frequency, radio2);
+    } else if (e.which == 221) {
+      // freq up, radio 2
+      frequency = parseInt($('#frequency2').val());
+      frequency = Math.min(frequency + 25, 10000);
+      $('#frequency2').val(frequency.toString());
+      setFrequency(frequency, radio2);
+    }
+  });
+
   // ========= radio1 controls
 
   $("#frequency").on('input', function() {
     newFrequency = $('#frequency').val();
     setFrequency(newFrequency, radio1);
-  });
-
-  $("#frequency").keyup(function(e) {
-    frequency = parseInt($('#frequency').val());
-    if (e.which == 38) {
-      // up arrow
-      frequency = Math.min(frequency + 25, 10000);
-    } else if (e.which == 40) {
-      frequency = Math.max(frequency - 25, 0);
-    }
-    $('#frequency').val(frequency.toString());
-    setFrequency(frequency, radio1);
   });
 
   $("#gain").on('input', function() {
@@ -177,18 +251,6 @@ $(function() {
     setFrequency(newFrequency, radio2);
   });
 
-  $("#frequency2").keyup(function(e) {
-    frequency = parseInt($('#frequency2').val());
-    if (e.which == 38) {
-      // up arrow
-      frequency = Math.min(frequency + 25, 10000);
-    } else if (e.which == 40) {
-      frequency = Math.max(frequency - 25, 0);
-    }
-    $('#frequency2').val(frequency.toString());
-    setFrequency(frequency, radio2);
-  });
-
   $("#gain2").on('input', function() {
     newGain = $('#gain2').val();
     if (newGain > 100) {
@@ -239,6 +301,50 @@ $(function() {
       $("#noise_gain2").val(newGain);
     }
     band2.setNoiseGain(newGain / 100.0  , radio2);
+  });
+
+  $("#keyer_speed").keyup(function(e) {
+    keyer_speed = parseInt($('#keyer_speed').val());
+    if (e.which == 38) {
+      // up arrow
+      keyer_speed += 5;
+    } else if (e.which == 40) {
+      keyer_speed = Math.max(keyer_speed - 5, 5);
+    }
+    $('#keyer_speed').val(keyer_speed.toString());
+    radio1.keyer.setSpeed(keyer_speed);
+    radio2.keyer.setSpeed(keyer_speed);
+  });
+
+  $("#f1").click(function() {
+    mycall = $("#mycall").val();
+    sendMessage("CQ TEST " + mycall + " " + mycall);
+  });
+
+  $("#f2").click(function() {
+    hiscall = $("#hiscall").val();
+    sendMessage(hiscall + " 5NN");
+  });
+
+  $("#f3").click(function() {
+    mycall = $("#mycall").val();
+    sendMessage("TU " + mycall);
+  });
+
+  $("#f4").click(function() {
+    mycall = $("#mycall").val();
+    sendMessage(mycall);
+  });
+
+  $("#f5").click(function() {
+    hiscall = $("#hiscall").val();
+    sendMessage(hiscall);
+  });
+
+  $("#abort").click(function() {
+    so2rcontroller.getFocusedRadio().keyer.abortMessage();
+    so2rcontroller.getFocusedRadio().unMute();
+    // TODO cancel timeout
   });
 
 });

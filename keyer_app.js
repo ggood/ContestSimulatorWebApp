@@ -7,8 +7,10 @@ $(function() {
   $("#send").click(function() {
     console.log("Click")
     context = new (window.AudioContext || window.webkitAudioContext)
-    keyer = new Keyer(context.destination);
+    keyer = new Keyer();
+    keyer.init(context, context.destination);
     keyer.setSpeed(speed);
+    keyer.setRepeatInterval(0.1);
     if (keyer.isSending()) {
         console.log("Can't send now, keyer sending");
     } else {

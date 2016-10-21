@@ -24,11 +24,16 @@ function wpmToElementDuration(wpm) {
   return 1.0 / wpm;
 };
 
-var Keyer = function() {
+var Keyer = function(callSign) {
   // Keyer configuration
+  this.callSign = callSign;
   this.speed = 25;  // in wpm
   this.repeatInterval = -1.0;  // Interval (in seconds) between repeats. Negative = disabled
   this.elementDuration = wpmToElementDuration(this.speed);
+  this.startTime = 0;
+  this.completionCallback = null;
+  this.completionCallbackId = null;
+  this.voxDelay = 250;  // Time from message end to unkey tx
 
   // Message sending state
   // Largest time at which we've scheduled an audio event
@@ -47,6 +52,7 @@ Keyer.prototype.init = function(context, audioSink) {
   this.voiceOsc.type = 'sine';
   this.voiceOsc.frequency.value = 500;
   this.voiceOsc.start();
+
   // envelopeGain control is used to generate keying envelope
   this.envelopeGain = context.createGain();
   this.envelopeGain.gain.value = 0.0;
@@ -56,6 +62,14 @@ Keyer.prototype.init = function(context, audioSink) {
   this.voiceOsc.connect(this.envelopeGain);
   this.envelopeGain.connect(this.monitorGain);
   this.monitorGain.connect(this.audioSink);
+};
+
+Keyer.prototype.stop = function() {
+  this.abortMessage();
+  // Just disconnecting the oscillator seems sufficient to cause
+  // CPU usage to drop when the keyer is stoppped. Previously,
+  // we did this.voiceOsc.stop();
+  this.voiceOsc.disconnect();
 };
 
 Keyer.prototype.setPitch = function(pitch) {
@@ -84,9 +98,15 @@ Keyer.prototype.isSending = function() {
 
 
 Keyer.prototype.abortMessage = function() {
+  this.setRepeatInterval(-1.0);
   this.envelopeGain.gain.cancelScheduledValues(this.startTime);
   this.envelopeGain.gain.linearRampToValueAtTime(0.0, context.currentTime + RAMP);
   this.latestScheduledEventTime = 0.0;
+  if (this.completionCallbackId != null) {
+    clearTimeout(this.completionCallbackId);
+    setTimeout(this.completionCallback, 0);
+    this.completionCallback = null;
+  }
 
 };
 
@@ -109,11 +129,15 @@ Keyer.prototype.blab = function(text) {
 /*
  Send the given text.
  */
-Keyer.prototype.send = function(text) {
+Keyer.prototype.send = function(text, completionCallback) {
   var self = this;
+  if (typeof completionCallback === "undefined") {
+    this.completionCallback = null;
+  } else {
+    this.completionCallback = completionCallback;
+  }
 
-  //console.log("Keyer: sending " + text);
-
+  //console.log("Keyer " + this.callSign + " sending " + text + " at freq " + this.voiceOsc.frequency.value);
   // Send morse
   var timeOffset = context.currentTime;
   this.startTime = timeOffset;
@@ -175,6 +199,7 @@ Keyer.prototype.send = function(text) {
     self.latestScheduledEventTime = timeOffset;
   }
 
+  // keyer send() implementation
   // Convert text to string representing morse dots and dashes
   var morseLetters = []
   for (var i = 0, len = text.length; i < len; i++) {
@@ -206,7 +231,12 @@ Keyer.prototype.send = function(text) {
     }
   }
 
-  if (this.repeatInterval > 0.0) {
+  if (this.completionCallback != null) {
+    var fireTime = ((self.latestScheduledEventTime - context.currentTime) * 1000);
+    this.completionCallbackId = setTimeout(this.completionCallback, fireTime + this.voxDelay);
+  }
+
+  if (this.repeatInterval > 0.0 && false) {  // XXX(ggood) added & !false to skip this code while I move cq repeat into station object
     // Arrange to send again in the future
     var delay =  ((self.latestScheduledEventTime + this.repeatInterval - context.currentTime) * 1000);
     // The following bind() call creates a new function with the "this" bound

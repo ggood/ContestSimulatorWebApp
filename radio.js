@@ -22,6 +22,10 @@ Radio.prototype.init = function(context, audioSink) {
   this.afGain = context.createGain();
   this.afGain.gain.value = 1.0;  // Unity gain
   this.afGain.connect(this.audioSink);
+  // Sidetone gain
+  this.sidetoneGain = context.createGain();
+  this.sidetoneGain.gain.value = 1.0;
+  this.sidetoneGain.connect(this.audioSink);
   // Filter setup
   this.filterBw = 500;  // Default filter bandwidth
   // Bandpass filter chain
@@ -42,12 +46,24 @@ Radio.prototype.init = function(context, audioSink) {
       this.filterBank[i].connect(this.afGain);
     }
   }
+  this.listenFrequency = 0;
+  // Keyer setup
+  this.keyer = new Keyer();
+  this.keyer.init(this.context, this.sidetoneGain);
 
   console.log("Radio: initialized");
 };
 
 Radio.prototype.setAFGain = function(value) {
   this.afGain.gain.value = value;
+};
+
+Radio.prototype.mute = function() {
+  this.afGain.disconnect();
+};
+
+Radio.prototype.unMute = function() {
+  this.afGain.connect(this.audioSink);
 };
 
 Radio.prototype.setFilterBandwidth = function(value) {
@@ -84,10 +100,23 @@ Radio.prototype.setFrequency = function(value) {
     console.log("Radio: not connected to a band, ignoring frequency change")
     return;
   }
+  this.listenFrequency = value;
   this.band.setListenFrequency(value);
 };
 
+Radio.prototype.sendMessage = function(message) {
+  self = this;
+  this.mute();
+  this.keyer.send(message, function() {
+    self.unMute();
+    self.band.handleMessageEnd(message, self.listenFrequency);
+  });
+};
+
 Radio.prototype.stop = function(value) {
-  this.band.radioDisconnected();
-  this.band = null;
+  if (this.band != null) {
+    this.band.radioDisconnected();
+    this.keyer.stop();
+    this.band = null;
+  }
 }
