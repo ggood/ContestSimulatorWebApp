@@ -153,7 +153,7 @@ $(function() {
    }
   });
 
-  // ========= tuning controls
+  // ========= keyboard shortcuts (tuning controls, radio focus...)
   $(document).keyup(function(e) {
     if (typeof e.which == 'undefined') {
       return;
@@ -182,6 +182,19 @@ $(function() {
       frequency = Math.min(frequency + 25, 10000);
       $('#frequency2').val(frequency.toString());
       setFrequency(frequency, radio2);
+    } else if (e.which == 192) {
+        // both radios
+        console.log("Selecting both radios");
+        so2rcontroller.selectBothRadios();
+        $("#select-both").css({backgroundColor: 'yellow'});
+        $("#select-radio1").css({backgroundColor: 'white'});
+        $("#select-radio2").css({backgroundColor: 'white'});
+    } else if (e.which == 220) {
+        // swap focus
+        console.log("Swapping radios");
+        var newRadio = so2rcontroller.swapRadios();
+    } else {
+      console.log(e.which);
     }
   });
 

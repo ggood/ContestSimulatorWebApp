@@ -58,6 +58,20 @@
    this.radio2Panner.connect(this.audioSink);
    this.focusRadio2();
  };
+ 
+ SO2RController.prototype.swapRadios = function() {
+   if (this.selectedRadio == 0) {
+     this.selectRadio1();
+   } else {
+     if (this.selectedRadio == 1) {
+       this.selectRadio2();
+     } else if (this.selectedRadio == 2) {
+       this.selectRadio1();
+     } else {
+       console.log("Can't switch from radio " + this.selectedRadio);
+     }
+   }
+ };
 
  SO2RController.prototype.selectBothRadios = function() {
    this.selectedRadio = 0;
@@ -84,4 +98,8 @@
       return radio2;
     }
     return null;
+  };
+
+  SO2RController.prototype.getFocusedRadioNumber = function() {
+    return this.focusedRadio;
   };
