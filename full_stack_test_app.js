@@ -96,6 +96,9 @@ $(function() {
     band2.setListenFrequency(0);
     band2.setNoiseGain(parseInt($('#noise_gain2').val() / 100.0));
 
+    band1.populateRandomly(50);
+    band2.populateRandomly(50);
+
     so2rcontroller.selectBothRadios();
 
     keyer_speed = parseInt($('#keyer_speed').val());

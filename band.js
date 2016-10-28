@@ -21,22 +21,13 @@
 var Band = function(bandName) {
   this.bandName = bandName;
   this.cwPitch = 610;  // TODO make this come from the radio
-  this.numRunners = 50;  // TODO make this configurable
+  this.numRunners = 0;
   // TODO remove hardcoded kber list
   this.runners = [];
   this.stations = [];
 };
 
 Band.prototype.init = function(context, audioSink) {
-  for (var i = 0; i < this.numRunners; i++) {
-    var callsign = document.callsigns[Math.floor(Math.random() * document.callsigns.length)];
-    this.runners.push(callsign);
-  }
-
-  for (var i = 0; i < this.runners.length; i++) {
-    this.stations.push(new Station(this.runners[i], "run"));
-  }
-
   this.context = context;
   this.audioSink = audioSink;
 
@@ -46,14 +37,24 @@ Band.prototype.init = function(context, audioSink) {
 
   this.noiseSource = new NoiseSource(this.gainNode);
   this.noiseSource.setEnabled(true);
-  // TODO(ggood) add QRN source
-  this.listenFrequency = 5000;
 
-  const BAND_UPPER_FREQ = 30000;  // 10 KHz for now...
+  this.bandwidth = 30000;
 
+  this.setListenFrequency(0);
+}
+
+Band.prototype.populateRandomly = function(stationCount) {
+  this.numRunners = stationCount;
+  for (var i = 0; i < this.numRunners; i++) {
+    var callsign = document.callsigns[Math.floor(Math.random() * document.callsigns.length)];
+    this.runners.push(callsign);
+  }
+  for (var i = 0; i < this.runners.length; i++) {
+    this.stations.push(new Station(this.runners[i], "run"));
+  }
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].init(this.context, this.gainNode);
-    this.stations[i].setFrequency(Math.random() * BAND_UPPER_FREQ);
+    this.stations[i].setFrequency(Math.random() * this.bandwidth);
     this.stations[i].keyer.setSpeed(Math.floor(Math.random() * 20) + 25);
     // TODO(ggood) don't model repeats this way. Model them as the stations
     // making the decision about when to send. That way, all of the state
@@ -61,11 +62,10 @@ Band.prototype.init = function(context, audioSink) {
     // TODO ggood repeat is station behavior this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
   }
-
-  this.setListenFrequency(0);
   for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].callCq();
   }
+
 }
 
 Band.prototype.radioDisconnected = function() {
