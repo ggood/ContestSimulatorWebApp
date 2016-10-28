@@ -60,6 +60,10 @@ Band.prototype.init = function(context, audioSink) {
     // transitions are initiated by the station or my inbound messages.
     // TODO ggood repeat is station behavior this.stations[i].keyer.setRepeatInterval(Math.random() + 1.5);
     this.stations[i].setRfGain(Math.random());
+  }
+
+  this.setListenFrequency(0);
+  for (var i = 0; i < this.stations.length; i++) {
     this.stations[i].callCq();
   }
 }

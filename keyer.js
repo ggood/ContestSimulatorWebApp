@@ -76,6 +76,7 @@ Keyer.prototype.setPitch = function(pitch) {
   // Schedule the frequency change in the future, otherwise
   // we will hear it sweep from the current to the new
   // frequency.
+  console.log(this.callSign + " set pitch " + pitch)
   var now = context.currentTime;
   this.voiceOsc.frequency.setValueAtTime(pitch, now);
 };
@@ -130,6 +131,7 @@ Keyer.prototype.blab = function(text) {
  Send the given text.
  */
 Keyer.prototype.send = function(text, completionCallback) {
+  //console.log(this.callSign + " send " + text)
   var self = this;
   if (typeof completionCallback === "undefined") {
     this.completionCallback = null;

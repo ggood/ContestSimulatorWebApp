@@ -42,7 +42,7 @@ Station.prototype.init = function(context, audioSink) {
 
 Station.prototype.setFrequency = function(frequency) {
   this.frequency = frequency;
-  console.log("Station  " + this.callSign + " set to freq "  + frequency);
+  //console.log("Station  " + this.callSign + " set to freq "  + frequency);
 };
 
 Station.prototype.getFrequency = function() {
