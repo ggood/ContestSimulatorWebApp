@@ -13,9 +13,23 @@
   <script src="keyer.js"></script>
   <script src="ducerboj.js"></script>
 
+  <script type="text/javascript">
+    <!-- load callsigns -->
+    function LoadFile() {
+      var oFrame = document.getElementById("callsigns");
+      var strRawContents = oFrame.contentWindow.document.body.childNodes[0].innerHTML;
+      while (strRawContents.indexOf("\r") >= 0)
+          strRawContents = strRawContents.replace("\r", "");
+      // Intentionally global
+      document.callsigns = strRawContents.split("\n");
+      console.log("File " + oFrame.src + " has " + document.callsigns.length + " lines");
+    }
+  </script>
+
 </head>
 
 <body>
+  <iframe id="callsigns" src="master.scp.txt" onload="LoadFile();" style="display: none;"></iframe>
   <div id="logPanel" class="log_panel">
     <div class="log" id="log_left"></div>
     <div class="log" id="log_right"></div>

@@ -1,7 +1,19 @@
+MAX_STATIONS = 3
+
 $( document ).ready(function() {
   console.log("READY");
   // Insert other on-load app initialization here
 });
+
+function mkStation(outputNode) {
+  var callsign = document.callsigns[Math.floor(Math.random()*document.callsigns.length)];
+  var station = new Station(callsign, "sp")
+  station.init(context, outputNode);
+  station.keyer.setPitch(Math.random() * 500 + 200);
+  station.keyer.setSpeed(Math.random() * 30 + 15);
+  station.setRfGain(Math.random);
+  return station
+}
 
 $(function() {
   $("#start").click(function() {
@@ -17,45 +29,41 @@ $(function() {
     var leftGain = context.createGain();
     var rightGain = context.createGain();
 
-    //var leftNoise = new NoiseSource(leftGain);
-    //var rightNoise = new NoiseSource(rightGain);
-
     leftGain.gain.value = 1.0;
     rightGain.gain.value = 1.0;
-
-    // so2rcontroller for contolling l-r switching
-    // each side of so2rcontroller is fed by a mixer, where the inputs
-    // are: noise source, and a keyer
 
     so2rcontroller.init(context, context.destination);
 
     leftGain.connect(so2rcontroller.getRadio1Input());
     rightGain.connect(so2rcontroller.getRadio2Input());
 
-    var leftStation = new Station("K6A", "sp");
-    var rightStation = new Station("K6B", "sp");
+    leftStations = []
+    rightStations = []
+    for (i = 0; i < MAX_STATIONS; i++) {
+      leftStations.push(mkStation(leftGain));
+      rightStations.push(mkStation(rightGain));
+    }
 
-    leftStation.init(context, leftGain);
-    leftStation.keyer.setPitch(500);
-    leftStation.keyer.setSpeed(25);
-    leftStation.setRfGain(Math.random);
-
-    rightStation.init(context, rightGain);
-    rightStation.keyer.setPitch(700);
-    rightStation.keyer.setSpeed(32);
-    rightStation.setRfGain(Math.random);
-    
     so2rcontroller.selectBothRadios();
 
-    leftStation.callCq();
-    rightStation.callCq();
+// TODO launch each station sending its call. Max say 5 times,
+// if entered in UI, stop and move on to next call. If not
+// entered, maybe register a penalty, move on to next call.
+    for (i = 0; i < MAX_STATIONS; i++) {
+      leftStations[i].callCq(2);
+      rightStations[i].callCq(2);
+    }
 
   });
 
   $("#end").click(function() {
     console.log("Stop");
+    for (i = 0; i < MAX_STATIONS; i++) {
+      leftStations[i].keyer.stop();
+      rightStations[i].keyer.stop();
+    }
   });
-  
+
   // Intercept keystrkes we handle specially
   $(document).keydown(function(e) {
     if (typeof e.which == 'undefined') {
@@ -72,7 +80,7 @@ $(function() {
       }
     }
   });
-  
+
   $('#callsign_left').on('keypress', function (e) {
     if (e.keyCode == 13) {
       // Put callsign in log
@@ -84,7 +92,7 @@ $(function() {
       $('#log_left').scrollTop($('#log_left')[0].scrollHeight - $('#log_left')[0].clientHeight);
     }
   });
-  
+
   $('#callsign_right').on('keypress', function (e) {
     if (e.keyCode == 13) {
       // Put callsign in log

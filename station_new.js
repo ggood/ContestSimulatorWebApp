@@ -22,6 +22,7 @@ var Station = function(callSign, mode) {
   this.rfGain = 0.5;
   this.dupes = [];
   this.currentDoublers = {};
+  this.cqCounter = 0;
 
   this.keyer = new Keyer(this.callSign);
   this.msgCompleteCallback = null;  // invoked when message send complete
@@ -55,6 +56,10 @@ Station.prototype.setExchange = function(exchange) {
 
 Station.prototype.getCallsign = function() {
   return this.callSign;
+};
+
+Station.prototype.setCallsign = function(callSign) {
+  this.callSign = callSign;
 };
 
 Station.prototype.setRfGain = function(gain) {
@@ -94,19 +99,26 @@ Station.prototype.getOpDelay = function() {
 /*
  Send a CQ
  */
-Station.prototype.callCq = function() {
+Station.prototype.callCq = function(repeat) {
   var self = this;
+  var isRepeat = repeat || false;
   //console.log("callCq for " + this.callSign);
   if (!(self.state == "idle" || self.state == "listening_after_cq" || self.state == "wait_after_tu")) {
     return;
   }
   this.msgCompleteCallback = function() {
     self.state = "listening_after_cq";
+    self.cqCounter++;
     // Set a timeout that fires if no one calls us - call CQ again
-    self.inactivityCallback = setTimeout(function() {self.callCq()}, self.cqRepeatDelay);
+    self.inactivityCallback = setTimeout(function() {self.callCq(true)}, self.cqRepeatDelay);
     //console.log("set inactivity callback " + self.inactivityCallback);
   }
   self.state = "calling_cq";
+  if (!isRepeat) {
+    self.cqCounter = 0;
+  } else {
+    console.log("Station " + self.callSign + " sending cq number " + self.cqCounter);
+  }
   this.keyer.send("cq test " + this.callSign + " " + this.callSign, this.msgCompleteCallback);
 };
 
