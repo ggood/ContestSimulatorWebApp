@@ -1,4 +1,4 @@
-MAX_STATIONS = 3
+MAX_STATIONS = 1
 
 $( document ).ready(function() {
   console.log("READY");
@@ -50,8 +50,10 @@ $(function() {
 // if entered in UI, stop and move on to next call. If not
 // entered, maybe register a penalty, move on to next call.
     for (i = 0; i < MAX_STATIONS; i++) {
-      leftStations[i].callCq(2);
-      rightStations[i].callCq(2);
+      //leftStations[i].callCq(2);
+      //rightStations[i].callCq(2);
+      leftStations[i].sendRepeated(leftStations[i].getCallsign(), 2000);
+      rightStations[i].sendRepeated(rightStations[i].getCallsign(), 2000);
     }
 
   });

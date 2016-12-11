@@ -123,6 +123,18 @@ Station.prototype.callCq = function(repeat) {
 };
 
 /*
+ Send the same text every <repeat> seconds. Not tied into state machine.
+*/
+Station.prototype.sendRepeated = function(message, repeatDelay) {
+  var self = this;
+  this.msgCompleteCallback = function() {
+    self.msgCounter++;
+    self.inactivityCallback = setTimeout(function() {self.sendRepeated(message, repeatDelay)}, repeatDelay);
+  }
+  this.keyer.send(message,   this.msgCompleteCallback);
+};
+
+/*
  Send the contest exchange
  */
 Station.prototype.sendExchange = function() {
