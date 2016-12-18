@@ -6,8 +6,12 @@ $( document ).ready(function() {
 });
 
 function mkStation(outputNode) {
+  // Select a callsign at random
   var callsign = document.callsigns[Math.floor(Math.random()*document.callsigns.length)];
+  // Create a station with that callsign in search and pounce mode
   var station = new Station(callsign, "sp")
+  console.log(context);
+  console.log(outputNode);
   station.init(context, outputNode);
   station.keyer.setPitch(Math.random() * 500 + 200);
   station.keyer.setSpeed(Math.random() * 30 + 15);
@@ -18,16 +22,19 @@ function mkStation(outputNode) {
 $(function() {
   $("#start").click(function() {
     console.log("Start");
+    // Wipe log fields
     $('#log_left').html("");
     $('#log_right').html("");
+    // Start focused on left input
     $("#callsign_left").focus();
 
     // Initialize audio chain
     context = new (window.AudioContext || window.webkitAudioContext);
 
     var so2rcontroller = new SO2RController();
-    var leftGain = context.createGain();
-    var rightGain = context.createGain();
+    // Any way to make these not global?
+    leftGain = context.createGain();
+    rightGain = context.createGain();
 
     leftGain.gain.value = 1.0;
     rightGain.gain.value = 1.0;
@@ -37,23 +44,18 @@ $(function() {
     leftGain.connect(so2rcontroller.getRadio1Input());
     rightGain.connect(so2rcontroller.getRadio2Input());
 
-    leftStations = []
-    rightStations = []
+    document.leftStations = []
+    document.rightStations = []
     for (i = 0; i < MAX_STATIONS; i++) {
-      leftStations.push(mkStation(leftGain));
-      rightStations.push(mkStation(rightGain));
+      document.leftStations.push(mkStation(leftGain));
+      document.rightStations.push(mkStation(rightGain));
     }
 
     so2rcontroller.selectBothRadios();
 
-// TODO launch each station sending its call. Max say 5 times,
-// if entered in UI, stop and move on to next call. If not
-// entered, maybe register a penalty, move on to next call.
     for (i = 0; i < MAX_STATIONS; i++) {
-      //leftStations[i].callCq(2);
-      //rightStations[i].callCq(2);
-      leftStations[i].sendRepeated(leftStations[i].getCallsign(), 2000);
-      rightStations[i].sendRepeated(rightStations[i].getCallsign(), 2000);
+      document.leftStations[i].sendRepeated(document.leftStations[i].getCallsign(), 2000);
+      document.rightStations[i].sendRepeated(document.rightStations[i].getCallsign(), 2000);
     }
 
   });
@@ -61,8 +63,8 @@ $(function() {
   $("#end").click(function() {
     console.log("Stop");
     for (i = 0; i < MAX_STATIONS; i++) {
-      leftStations[i].keyer.stop();
-      rightStations[i].keyer.stop();
+      document.leftStations[i].keyer.stop();
+      document.rightStations[i].keyer.stop();
     }
   });
 
@@ -106,4 +108,27 @@ $(function() {
       $('#log_right').scrollTop($('#log_right')[0].scrollHeight - $('#log_right')[0].clientHeight);
     }
   });
+
+  $("#reset_left").click(function() {
+    console.log("Reset left");
+    for (i = 0; i < MAX_STATIONS; i++) {
+      document.leftStations[i].cancelRepeated();
+      document.leftStations[i].stop();
+      var newStation = mkStation(leftGain);
+      document.leftStations[i] = newStation;
+      setTimeout(function() {newStation.sendRepeated(newStation.getCallsign(), 2000)}, 2000);
+    }
+  });
+
+  $("#reset_right").click(function() {
+    console.log("Reset right");
+    for (i = 0; i < MAX_STATIONS; i++) {
+      document.rightStations[i].cancelRepeated();
+      document.rightStations[i].stop();
+      var newStation = mkStation(rightGain);
+      document.rightStations[i] = newStation;
+      setTimeout(function() {newStation.sendRepeated(newStation.getCallsign(), 2000)}, 2000);
+    }
+  });
+
 });

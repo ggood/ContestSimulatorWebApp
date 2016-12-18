@@ -123,16 +123,34 @@ Station.prototype.callCq = function(repeat) {
 };
 
 /*
- Send the same text every <repeat> seconds. Not tied into state machine.
+ Send the same text every <repeat> seconds. If msgCount is provided, the
+ message is sent <msgCount> times.
 */
-Station.prototype.sendRepeated = function(message, repeatDelay) {
+Station.prototype.sendRepeated = function(message, repeatDelay, msgCount) {
   var self = this;
+  if (msgCount === undefined) {
+    self.msgCounter = 5;
+  } else {
+    self.msgCounter = msgCount;
+  }
   this.msgCompleteCallback = function() {
-    self.msgCounter++;
-    self.inactivityCallback = setTimeout(function() {self.sendRepeated(message, repeatDelay)}, repeatDelay);
+    console.log("Station " + self.callSign + " msgCounter is " + self.msgCounter);
+    if (self.msgCounter > 0) {
+      self.msgCounter--;
+      self.inactivityCallback = setTimeout(function() {self.keyer.send(message, self.msgCompleteCallback)}, repeatDelay);
+    }
   }
   this.keyer.send(message,   this.msgCompleteCallback);
 };
+
+
+/*
+ Cancel repeated message. Allows currently sending message to complete.
+*/
+Station.prototype.cancelRepeated = function() {
+  this.msgCounter = 0;
+}
+
 
 /*
  Send the contest exchange
