@@ -20,6 +20,16 @@
   width: 300px;
 }
 
+.score_panel {
+  border-width: 1px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: 50px;
+  width: 300px;
+}
+
 .log_panel {
   border-width: 1px;
   padding: 2px;
@@ -31,7 +41,7 @@
 }
 
 .log {
-  height: 100px;
+  height: 500px;
   padding: 2px;
   border-width: 1px;
   border-color: black;
@@ -67,4 +77,3 @@ body {
   font-size: large;
   text-transform: uppercase;
 }
-

@@ -16,12 +16,47 @@ function mkStation(outputNode) {
   station.keyer.setPitch(Math.random() * 500 + 200);
   station.keyer.setSpeed(Math.random() * 30 + 15);
   station.setRfGain(Math.random);
-  return station
+  return station;
+}
+
+function replaceStation(index, active, audioSink) {
+  active[index].stop();
+  var station = mkStation(audioSink);
+  active[index] = station;
+  station.sendRepeated(station.getCallsign(), 2000);
+}
+
+function checkCallsign(callSign, radio) {
+  active = (radio == 0) ? document.leftStations : document.rightStations;
+  var audioSink = (radio == 0) ? leftGain : rightGain;
+  var correct = false;
+  for (si = 0; si < active.length; si++) {
+    if (active[si].getCallsign() == callSign) {
+      correct = true;
+      console.log("Correct: " + callSign);
+      document.score++;
+      break;
+    }
+  }
+  console.log("Incorrect: " + callSign);
+  // If the call was correct, then make a new one. If it was wrong,
+  // but we're only doing one station in each ear, then create a
+  // new one.
+  if (correct) {
+    replaceStation(si, active, audioSink);
+  } else if (MAX_STATIONS == 1) {
+    replaceStation(0, active, audioSink);
+  }
+  return correct;
 }
 
 $(function() {
   $("#start").click(function() {
     console.log("Start");
+
+    // Initialize score
+    $("#score").val(0);
+
     // Wipe log fields
     $('#log_left').html("");
     $('#log_right').html("");
@@ -45,7 +80,10 @@ $(function() {
     rightGain.connect(so2rcontroller.getRadio2Input());
 
     document.leftStations = []
+    document.leftGain = leftGain;
     document.rightStations = []
+    document.rightGain = rightGain;
+    document.score = 0;
     for (i = 0; i < MAX_STATIONS; i++) {
       document.leftStations.push(mkStation(leftGain));
       document.rightStations.push(mkStation(rightGain));
@@ -53,12 +91,31 @@ $(function() {
 
     so2rcontroller.selectBothRadios();
 
+    // TODO(ggood) instead of keeping separate arrays for left and right
+    // stations, keep one array of tuples (stn, audioSink). That will
+    // clean up all of the timeout handlers
     for (i = 0; i < MAX_STATIONS; i++) {
       document.leftStations[i].sendRepeated(document.leftStations[i].getCallsign(), 2000);
       document.rightStations[i].sendRepeated(document.rightStations[i].getCallsign(), 2000);
     }
 
   });
+
+  // Start reaper for lonely stations who have given up sending their callSign
+  // Runs every 1/2 second
+  var reaperId = setInterval(function(){
+    console.log("Checking for lonelies");
+    for (i = 0; i < MAX_STATIONS; i++) {
+      var station = document.leftStations[i];
+      if (station.msgCounter < 1) {
+        console.log("Station " + station.getCallsign() + " is lonely");
+      }
+      station = document.rightStations[i];
+      if (station.msgCounter < 1) {
+        console.log("Station " + station.getCallsign() + " is lonely");
+      }
+    }
+  }, 500);
 
   $("#end").click(function() {
     console.log("Stop");
@@ -90,8 +147,11 @@ $(function() {
       // Put callsign in log
       var callsign = $("#callsign_left").val().toUpperCase();
       $("#callsign_left").val("");
-      console.log("Log " + callsign);
-      $('#log_left').append("<br>&#9989;" + callsign );
+      var correct = checkCallsign(callsign, 0);
+      // Update score
+      $("#score").val(document.score);
+      var icon = correct ? "<br>&#9989;" : "<br>&#10060;";
+      $('#log_left').append(icon + callsign );
       // Keep scrolled to bottom
       $('#log_left').scrollTop($('#log_left')[0].scrollHeight - $('#log_left')[0].clientHeight);
     }
@@ -102,8 +162,11 @@ $(function() {
       // Put callsign in log
       var callsign = $("#callsign_right").val().toUpperCase();
       $("#callsign_right").val("");
-      console.log("Log " + callsign);
-      $('#log_right').append("<br>&#10060;" + callsign );
+      var correct = checkCallsign(callsign, 1);
+      // Update score
+      $("#score").val(document.score);
+      var icon = correct ? "<br>&#9989;" : "<br>&#10060;";
+      $('#log_right').append(icon + callsign );
       // Keep scrolled to bottom
       $('#log_right').scrollTop($('#log_right')[0].scrollHeight - $('#log_right')[0].clientHeight);
     }
