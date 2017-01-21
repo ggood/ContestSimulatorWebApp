@@ -26,13 +26,17 @@
    this.context = context;
    this.audioSink = audioSink;
 
-   this.radio1Panner = context.createStereoPanner();
-   this.radio2Panner = context.createStereoPanner();
+   this.radio1Panner = context.createPanner();
+   this.radio1Panner.panningModel = 'equalpower';
+   this.radio2Panner = context.createPanner();
+   this.radio2Panner.panningModel = 'equalpower';
+
+
    this.radio1Panner.connect(context.destination);
    this.radio2Panner.connect(context.destination);
    // Default is radio 1 pan left, radio2 pan right
-   this.radio1Panner.pan.value = -1.0;
-   this.radio2Panner.pan.value = 1.0;
+   this.radio1Panner.setPosition(-1.0, 0, 0);
+   this.radio2Panner.setPosition(1.0, 0, 0);
  };
 
  SO2RController.prototype.getRadio1Input = function() {
@@ -45,7 +49,7 @@
 
  SO2RController.prototype.selectRadio1 = function() {
    this.selectedRadio = 1;
-   this.radio1Panner.pan.value = 0.0;
+   this.radio1Panner.setPosition(0, 0, 0);
    this.radio2Panner.disconnect();
    this.radio1Panner.connect(this.audioSink);
    this.focusRadio1();
@@ -53,12 +57,12 @@
 
  SO2RController.prototype.selectRadio2 = function() {
    this.selectedRadio = 2;
-   this.radio2Panner.pan.value = 0.0;
+   this.radio2Panner.setPosition(0, 0, 0);
    this.radio1Panner.disconnect();
    this.radio2Panner.connect(this.audioSink);
    this.focusRadio2();
  };
- 
+
  SO2RController.prototype.swapRadios = function() {
    if (this.selectedRadio == 0) {
      this.selectRadio1();
@@ -79,8 +83,8 @@
    this.radio2Panner.disconnect();
    this.radio1Panner.connect(this.audioSink);
    this.radio2Panner.connect(this.audioSink);
-   this.radio1Panner.pan.value = -1.0;
-   this.radio2Panner.pan.value = 1.0;
+   this.radio1Panner.setPosition(-1.0, 0, 0);
+   this.radio2Panner.setPosition(1.0, 0, 0);
  };
 
   SO2RController.prototype.focusRadio1 = function() {
