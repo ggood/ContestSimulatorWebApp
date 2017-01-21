@@ -99,23 +99,25 @@ $(function() {
       document.rightStations[i].sendRepeated(document.rightStations[i].getCallsign(), 2000);
     }
 
+    // Start reaper for lonely stations who have given up sending their callSign
+    // Runs every 1/2 second
+    var reaperId = setInterval(function(){
+      console.log("Checking for lonelies");
+      for (i = 0; i < MAX_STATIONS; i++) {
+        var station = document.leftStations[i];
+        if (station.msgCounter < 1) {
+          console.log("Station " + station.getCallsign() + " is lonely");
+        }
+        station = document.rightStations[i];
+        if (station.msgCounter < 1) {
+          console.log("Station " + station.getCallsign() + " is lonely");
+        }
+      }
+    }, 500);
+
   });
 
-  // Start reaper for lonely stations who have given up sending their callSign
-  // Runs every 1/2 second
-  var reaperId = setInterval(function(){
-    console.log("Checking for lonelies");
-    for (i = 0; i < MAX_STATIONS; i++) {
-      var station = document.leftStations[i];
-      if (station.msgCounter < 1) {
-        console.log("Station " + station.getCallsign() + " is lonely");
-      }
-      station = document.rightStations[i];
-      if (station.msgCounter < 1) {
-        console.log("Station " + station.getCallsign() + " is lonely");
-      }
-    }
-  }, 500);
+
 
   $("#end").click(function() {
     console.log("Stop");
