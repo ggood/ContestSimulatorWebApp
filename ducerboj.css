@@ -77,3 +77,15 @@ body {
   font-size: large;
   text-transform: uppercase;
 }
+
+.bonus {
+  background-color: #33cc33;
+}
+
+.correct {
+  background-color: #d6f5d6;
+}
+
+.normal {
+  background-color: #ffffff;
+}

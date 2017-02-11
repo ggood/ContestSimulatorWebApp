@@ -3,6 +3,7 @@ MAX_STATIONS = 1
 $( document ).ready(function() {
   console.log("READY");
   // Insert other on-load app initialization here
+  document.lastRadioLogged = -1;
 });
 
 function mkStation(outputNode) {
@@ -34,7 +35,12 @@ function checkCallsign(callSign, radio) {
     if (active[si].getCallsign() == callSign) {
       correct = true;
       console.log("Correct: " + callSign);
-      document.score++;
+      if (document.lastRadioLogged != -1 && radio != document.lastRadioLogged) {
+        document.score += 5;
+      } else {
+        document.score++;
+      }
+      document.lastRadioLogged = radio;
       break;
     }
   }
@@ -48,6 +54,26 @@ function checkCallsign(callSign, radio) {
     replaceStation(0, active, audioSink);
   }
   return correct;
+}
+
+function animateScore(oldScore, newScore) {
+  console.log("animate: " + oldScore + " " + newScore);
+  if (newScore - oldScore > 4) {
+    console.log("bonus");
+    $("#score").removeClass("wrong");
+    $("#score").removeClass("correct");
+    $("#score").addClass("bonus");
+  } else if (newScore - oldScore > 0) {
+    console.log("correct");
+    $("#score").removeClass("wrong");
+    $("#score").addClass("correct");
+    $("#score").aremoveClass("bonus");
+  } else {
+    console.log("wrong");
+    $("#score").addClass("wrong");
+    $("#score").removeClass("correct");
+    $("#score").removeClass("bonus");
+  }
 }
 
 $(function() {
@@ -149,6 +175,7 @@ $(function() {
       // Put callsign in log
       var callsign = $("#callsign_left").val().toUpperCase();
       $("#callsign_left").val("");
+      var oldScore = document.score;
       var correct = checkCallsign(callsign, 0);
       // Update score
       $("#score").val(document.score);
@@ -156,6 +183,8 @@ $(function() {
       $('#log_left').append(icon + callsign );
       // Keep scrolled to bottom
       $('#log_left').scrollTop($('#log_left')[0].scrollHeight - $('#log_left')[0].clientHeight);
+      // animate score
+      animateScore(oldScore, document.score);
     }
   });
 
@@ -164,6 +193,7 @@ $(function() {
       // Put callsign in log
       var callsign = $("#callsign_right").val().toUpperCase();
       $("#callsign_right").val("");
+      var oldScore = document.score;
       var correct = checkCallsign(callsign, 1);
       // Update score
       $("#score").val(document.score);
@@ -171,6 +201,8 @@ $(function() {
       $('#log_right').append(icon + callsign );
       // Keep scrolled to bottom
       $('#log_right').scrollTop($('#log_right')[0].scrollHeight - $('#log_right')[0].clientHeight);
+      // animate score
+      animateScore(oldScore, document.score);
     }
   });
 
