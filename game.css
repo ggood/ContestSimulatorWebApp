@@ -1,0 +1,84 @@
+* {
+  font-family: sans-serif;
+  font-size: large;
+  box-sizing: border-box;
+}
+
+.qso_input {
+  padding: 1px;
+  width: 100px;
+  text-transform: uppercase;
+}
+
+.outer_panel {
+  border-width: 1px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: auto;
+  width: 400px;
+}
+
+.score_panel {
+  border-width: 1px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: 100px;
+  width: 400px;
+}
+
+.score_field {
+  float: right;
+  clear: both;
+}
+
+.log_panel {
+  border-width: 1px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: auto;
+  width: 400px;
+}
+
+.log {
+  height: 500px;
+  padding: 2px;
+  border-width: 1px;
+  border-color: black;
+  border-style: solid;
+  float: left;
+  width: 50%;
+  overflow: auto;
+}
+
+.radio_panel {
+  border-width: 1px;
+  padding: 2px;
+  border-color: #999;
+  border-style: solid;
+  overflow: hidden;
+  height: auto;
+  float: left;
+  width: 50%;
+}
+
+.action_button {
+  font-size: large;
+  background-color: #4df;
+  width: 80px;
+  height: 30px;
+}
+body {
+  font-size: large;
+}
+
+.controls {
+  height: 30px;
+  font-size: large;
+  text-transform: uppercase;
+}
