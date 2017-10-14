@@ -162,7 +162,7 @@ $(function() {
 
   $("#help").click(function() {
     console.log("Help");
-    window.open("help.html", "helpWindow", "height=700,width=640,top=10,left=10");
+    window.open("ducerboj-help.html", "helpWindow", "height=700,width=640,top=10,left=10");
   });
 
   // Intercept keystrokes we handle specially
