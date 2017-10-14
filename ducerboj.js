@@ -19,7 +19,7 @@ function mkStation(outputNode) {
   console.log(outputNode);
   station.init(context, outputNode);
   station.keyer.setPitch(Math.random() * 500 + 200);
-  station.keyer.setSpeed(Math.random() * 30 + 15);
+  station.keyer.setSpeed(Math.random() * 25 + 10);
   station.setRfGain(Math.random);
   return station;
 }
