@@ -10,6 +10,9 @@
   text-transform: uppercase;
 }
 
+.qso_input:focus{
+  background-color: #ffffb3;
+}
 .outer_panel {
   border-width: 1px;
   padding: 2px;

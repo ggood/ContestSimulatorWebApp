@@ -28,6 +28,9 @@ var Station = function(callSign, audioSink) {
   // If set, we will mute this audio gain node when sending
   this.rMixer = null;
 
+  // Timeout used for repeating messages
+  this.repeatTimeout = null;
+
 };
 
 Station.prototype.setRxMixer = function(mixer) {
@@ -73,6 +76,14 @@ Station.prototype.sendTU = function() {
 
 Station.prototype.setRepeatDelay = function(delay) {
   this.repeatDelay = delay;
+}
+
+Station.prototype.stop = function() {
+    console.log("XXXXX STOP")
+    if (this.repeatTimeout != null) {
+        clearTimeout(this.repeatTimeout);
+        this.repeatTimeout = null;
+    }
 }
 
 /*
@@ -149,7 +160,7 @@ Station.prototype.send = function(text) {
 
   if (this.repeatDelay > 0.0) {
     // Arrange to send again in the future
-    setTimeout(this.send(text), this.repeatDelay);
+    this.repeatTimeout = setTimeout(this.send(text), this.repeatDelay);
   }
 
   function toMorse(char) {

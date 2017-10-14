@@ -81,6 +81,8 @@ Station.prototype.unMute = function() {
 Station.prototype.stop = function() {
   console.log("Clearing inactivity timeout "  + this.inactivityCallback + " for station " + this.callSign);
   clearTimeout(this.inactivityCallback);
+  console.log("Clearing pending action timeout "  + this.pendingAction + " for station " + this.callSign);
+  clearTimeout(this.pendingAction);
   this.keyer.stop();
 };
 

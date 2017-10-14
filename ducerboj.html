@@ -32,7 +32,7 @@
 <body>
   <iframe id="callsigns" src="master.scp.txt" onload="LoadFile();" style="display: none;"></iframe>
   <div id="scorePanel" class="score_panel">
-    Score: <input type="text" id="score" class="score_field"</input>
+    Score: <input type="text" id="score" class="score_field" readonly="readonly"</input>
   </div>
   <div id="logPanel" class="log_panel">
     <div class="log" id="log_left"></div>
@@ -51,8 +51,9 @@
       <br>
       <button type="button" id="reset_right" class="action_button">Reset</button>
     </div id="controls" class="controls">
-  <button type="button" id="start" class="action_button">Start</button>
+      <button type="button" id="start" class="action_button">Start</button>
       <button type="button" id="end" class="action_button">End</button>
+      <button type="button" id="help" class="action_button">Help</button>
     <div>
   </div>
   </div>

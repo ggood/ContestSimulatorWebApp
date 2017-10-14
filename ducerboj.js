@@ -1,3 +1,7 @@
+// ducerboj.js - an app to help train your brain to do SO2R
+// (Single Operator 2 Radio) contesting.
+//
+
 MAX_STATIONS = 1
 
 $( document ).ready(function() {
@@ -50,8 +54,6 @@ function checkCallsign(callSign, radio) {
   // new one.
   if (correct) {
     replaceStation(si, active, audioSink);
-  } else if (MAX_STATIONS == 1) {
-    replaceStation(0, active, audioSink);
   }
   return correct;
 }
@@ -126,17 +128,19 @@ $(function() {
     }
 
     // Start reaper for lonely stations who have given up sending their callSign
-    // Runs every 1/2 second
-    var reaperId = setInterval(function(){
+    // Runs every 1/2 second. reaperId is intentionally global.
+    reaperId = setInterval(function(){
       console.log("Checking for lonelies");
       for (i = 0; i < MAX_STATIONS; i++) {
         var station = document.leftStations[i];
         if (station.msgCounter < 1) {
-          console.log("Station " + station.getCallsign() + " is lonely");
+          console.log("Station " + station.getCallsign() + " is lonely, spawining new station");
+          replaceStation(i, document.leftStations, leftGain);
         }
         station = document.rightStations[i];
         if (station.msgCounter < 1) {
-          console.log("Station " + station.getCallsign() + " is lonely");
+          console.log("Station " + station.getCallsign() + " is lonely, spawning new station");
+          replaceStation(i, document.rightStations, rightGain);
         }
       }
     }, 500);
@@ -148,12 +152,20 @@ $(function() {
   $("#end").click(function() {
     console.log("Stop");
     for (i = 0; i < MAX_STATIONS; i++) {
+      document.leftStations[i].stop();
       document.leftStations[i].keyer.stop();
+      document.rightStations[i].stop();
       document.rightStations[i].keyer.stop();
+      clearTimeout(reaperId);
     }
   });
 
-  // Intercept keystrkes we handle specially
+  $("#help").click(function() {
+    console.log("Help");
+    window.open("help.html", "helpWindow", "height=700,width=640,top=10,left=10");
+  });
+
+  // Intercept keystrokes we handle specially
   $(document).keydown(function(e) {
     if (typeof e.which == 'undefined') {
       return;
