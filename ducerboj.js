@@ -28,7 +28,8 @@ function replaceStation(index, active, audioSink) {
   active[index].stop();
   var station = mkStation(audioSink);
   active[index] = station;
-  station.sendRepeated(station.getCallsign(), 2000);
+  delay = Math.random() * 2000;
+  setTimeout(function() {station.sendRepeated(station.getCallsign(), 2000)}, 2000);
 }
 
 function checkCallsign(callSign, radio) {
@@ -69,7 +70,7 @@ function animateScore(oldScore, newScore) {
     console.log("correct");
     $("#score").removeClass("wrong");
     $("#score").addClass("correct");
-    $("#score").aremoveClass("bonus");
+    $("#score").removeClass("bonus");
   } else {
     console.log("wrong");
     $("#score").addClass("wrong");
