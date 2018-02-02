@@ -32,28 +32,41 @@ function replaceStation(index, active, audioSink) {
   setTimeout(function() {station.sendRepeated(station.getCallsign(), 2000)}, 2000);
 }
 
-function checkCallsign(callSign, radio) {
+function checkCallsignOnRadio(callSign, radio) {
   active = (radio == 0) ? document.leftStations : document.rightStations;
-  var audioSink = (radio == 0) ? leftGain : rightGain;
-  var correct = false;
   for (si = 0; si < active.length; si++) {
     if (active[si].getCallsign() == callSign) {
-      correct = true;
-      console.log("Correct: " + callSign);
-      if (document.lastRadioLogged != -1 && radio != document.lastRadioLogged) {
-        document.score += 5;
-      } else {
-        document.score++;
-      }
-      document.lastRadioLogged = radio;
-      break;
+      return true;
     }
   }
-  console.log("Incorrect: " + callSign);
-  // If the call was correct, then make a new one. If it was wrong,
-  // but we're only doing one station in each ear, then create a
-  // new one.
+  return false;
+}
+
+
+function checkCallsign(callSign) {
+  var audioSink;
+  var correct = false;
+  var radio;
+  if (checkCallsignOnRadio(callSign, 0)) {
+    correct = true;
+    audioSink = leftGain;
+    radio = 0;
+  } else if (checkCallsignOnRadio(callSign, 1)) {
+    correct = true;
+    audioSink = rightGain;
+    radio = 1;
+  } else {
+    // Incorrect
+    console.log("Incorrect: " + callSign);
+  }
   if (correct) {
+    console.log("Correct: " + callSign);
+    document.lastRadioLogged = radio;
+    if (document.lastRadioLogged != -1 && radio != document.lastRadioLogged) {
+      document.score += 5;
+    } else {
+      document.score++;
+    }
     replaceStation(si, active, audioSink);
   }
   return correct;
@@ -89,8 +102,8 @@ $(function() {
     // Wipe log fields
     $('#log_left').html("");
     $('#log_right').html("");
-    // Start focused on left input
-    $("#callsign_left").focus();
+    // Set focus to callsign input
+    $("#callsign").focus();
 
     // Initialize audio chain
     context = new (window.AudioContext || window.webkitAudioContext);
@@ -183,11 +196,11 @@ $(function() {
     }
   });
 
-  $('#callsign_left').on('keypress', function (e) {
+  $('#callsign').on('keypress', function (e) {
     if (e.keyCode == 13) {
       // Put callsign in log
-      var callsign = $("#callsign_left").val().toUpperCase();
-      $("#callsign_left").val("");
+      var callsign = $("#callsign").val().toUpperCase();
+      $("#callsign").val("");
       var oldScore = document.score;
       var correct = checkCallsign(callsign, 0);
       // Update score

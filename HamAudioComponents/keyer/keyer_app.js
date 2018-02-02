@@ -12,7 +12,9 @@ $(function() {
       keyer.setMonitorGain(1.0);
     }
     if (!keyer.isSending()) {
+      speed = $('#speed').val();
       keyer.setSpeed(speed);
+      keyer.setPitch($('#pitch').val());
       keyer.send(document.getElementById("send_text").value);
     }
   });
@@ -20,7 +22,7 @@ $(function() {
   $("#cancel").click(function() {
     if (keyer != null) {
       keyer.stop();
-      keyer = null
+      keyer = null;
     }
   });
 
@@ -35,6 +37,11 @@ $(function() {
     newSpeed = $('#speed').val();
     if (!isNaN(newSpeed)) {
       speed = newSpeed;
+      if (keyer != null) {
+        // currently, can't change speed while sending, but
+        // put here for when we can.
+        keyer.setSpeed(newSpeed);
+      }
     }
   });
 });
