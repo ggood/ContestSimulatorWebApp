@@ -6,6 +6,33 @@ called to simulate station behavior, such as
 calling CQ. It also has other configuration to
 make the station unique, such as a contest exchange.
 
+Specific properties:
+
+** callSign: the callsign of the station.
+
+** mode: "run", "sp", or "manual"
+
+A station in "sp" (search and pounce) mode will respond to a cq
+if it falls within a certain range of its current frequency.
+A station in "sp" mode will change its own frequency, in
+order to find stations calling cq.
+
+A station in "run" mode will call cq repeatedly, and will respond
+to any station that is within a certain range of the runner's
+frequency and responds to the cq. A station in run mode may choose
+to change its frequency if it deems necessary, due to lack
+of responses or too much activity nearby.
+
+A station in "manual" mode is being operated by the human
+running the simulator, and takes no actions on its own.
+
+** frequency: the current frequency of the station.
+
+Changing the frequency of the station affects which stations
+it will interact with, and, if the station's audio is being
+monitored, affects what is audible.
+
+
 Frequencies are expressed as an offset from a
 base frequency. The units are hertz.
 */
@@ -14,9 +41,9 @@ var Station = function(callSign, mode) {
   // Station configuration
   this.callSign = callSign;
   this.mode = mode;
-  this.state = "idle";
 
   // Station state (may change during contest)
+  this.state = "idle";
   this.frequency = 0;
   this.exchange = "5nn 3";
   this.rfGain = 0.5;
@@ -43,7 +70,7 @@ Station.prototype.init = function(context, audioSink) {
 
 Station.prototype.setFrequency = function(frequency) {
   this.frequency = frequency;
-  //console.log("Station  " + this.callSign + " set to freq "  + frequency);
+  console.log("Station  " + this.callSign + " set to freq "  + frequency);
 };
 
 Station.prototype.getFrequency = function() {
