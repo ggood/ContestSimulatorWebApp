@@ -24,10 +24,14 @@ function mkStation(outputNode) {
   return station;
 }
 
-function replaceStation(index, active, audioSink) {
+function replaceStation(index, active, callSign, audioSink) {
+  if (active[index].getCallsign() != callSign) {
+    return;
+  }
   active[index].stop();
   var station = mkStation(audioSink);
   active[index] = station;
+  document.allCalls.push(station.getCallsign());
   delay = Math.random() * 2000;
   setTimeout(function() {station.sendRepeated(station.getCallsign(), 2000)}, 2000);
 }
@@ -46,18 +50,25 @@ function checkCallsignOnRadio(callSign, radio) {
 function checkCallsign(callSign) {
   var audioSink;
   var correct = false;
+  var current = false;
   var radio;
   if (checkCallsignOnRadio(callSign, 0)) {
     correct = true;
     audioSink = leftGain;
     radio = 0;
+    current = true;
   } else if (checkCallsignOnRadio(callSign, 1)) {
     correct = true;
     audioSink = rightGain;
     radio = 1;
+    current = true;
   } else {
-    // Incorrect
-    console.log("Incorrect: " + callSign);
+    // Was it previously copied and now being entered?
+    for (si = 0; si < document.allCalls.length; si++) {
+      if (document.allCalls[si] == callSign) {
+        correct = true;
+      }
+    }
   }
   if (correct) {
     console.log("Correct: " + callSign);
@@ -67,7 +78,11 @@ function checkCallsign(callSign) {
     } else {
       document.score++;
     }
-    replaceStation(si, active, audioSink);
+    if (current) {
+      replaceStation(si, active, callSign, audioSink);
+    }
+  } else {
+    console.log("Incorrect");
   }
   return correct;
 }
@@ -121,14 +136,19 @@ $(function() {
     leftGain.connect(so2rcontroller.getRadio1Input());
     rightGain.connect(so2rcontroller.getRadio2Input());
 
-    document.leftStations = []
+    document.leftStations = [];
     document.leftGain = leftGain;
-    document.rightStations = []
+    document.rightStations = [];
     document.rightGain = rightGain;
+    document.allCalls = []; // All callsigns used
     document.score = 0;
     for (i = 0; i < MAX_STATIONS; i++) {
-      document.leftStations.push(mkStation(leftGain));
-      document.rightStations.push(mkStation(rightGain));
+      leftStation = mkStation(leftGain);
+      document.allCalls.push(leftStation.getCallsign());
+      document.leftStations.push(leftStation);
+      rightStation = mkStation(rightGain);
+      document.allCalls.push(rightStation.getCallsign());
+      document.rightStations.push(rightStation);
     }
 
     so2rcontroller.selectBothRadios();
@@ -148,13 +168,13 @@ $(function() {
       for (i = 0; i < MAX_STATIONS; i++) {
         var station = document.leftStations[i];
         if (station.msgCounter < 1) {
-          console.log("Station " + station.getCallsign() + " is lonely, spawining new station");
-          replaceStation(i, document.leftStations, leftGain);
+          console.log("Station " + station.getCallsign() + " is lonely, spawning new station");
+          replaceStation(i, document.leftStations, station.getCallsign(), leftGain);
         }
         station = document.rightStations[i];
         if (station.msgCounter < 1) {
           console.log("Station " + station.getCallsign() + " is lonely, spawning new station");
-          replaceStation(i, document.rightStations, rightGain);
+          replaceStation(i, document.rightStations, station.getCallsign(), rightGain);
         }
       }
     }, 500);
